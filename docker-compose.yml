@@ -1,0 +1,9 @@
+services:
+  trilogy_app:
+    build: .
+    image: trilogy_app_image:latest
+    container_name: trilogy_app_container
+    ports:
+      - "8080:${PORT}"
+    env_file:
+      - .env
