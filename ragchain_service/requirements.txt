@@ -1,0 +1,7 @@
+fastapi==0.95.2
+uvicorn==0.22.0
+python-dotenv==1.0.0
+langchain==0.0.266
+openai==0.28.0
+pymongo==4.3.3
+pydantic<2

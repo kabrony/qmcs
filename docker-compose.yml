@@ -1,4 +1,5 @@
 services:
+<<<<<<< HEAD
   trilogy_app:
     build: .
     image: trilogy_app_image:latest
@@ -7,3 +8,50 @@ services:
       - "8080:${PORT}"
     env_file:
       - .env
+=======
+  solana_agents:
+    build:
+      context: ./solana_agents
+      dockerfile: Dockerfile
+    container_name: solana_agents
+    environment:
+      - SOLANA_RPC_URL=${SOLANA_RPC_URL}
+      - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
+      - MONGO_DETAILS=${MONGO_DETAILS}
+    ports:
+      - "4000:4000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:4000/health"]
+      interval: 30s
+      retries: 3
+
+  ragchain_service:
+    build:
+      context: ./ragchain_service
+      dockerfile: Dockerfile
+    container_name: ragchain_service
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:5000/health"]
+      interval: 30s
+      retries: 3
+
+  quant_service:
+    build:
+      context: ./quant_service
+      dockerfile: Dockerfile
+    container_name: quant_service
+    environment:
+      - MONGO_DETAILS=${MONGO_DETAILS}
+    ports:
+      - "7000:7000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:7000/health"]
+      interval: 30s
+      retries: 3
+
+networks:
+  default:
+    driver: bridge
+>>>>>>> ad2001f2 (Update: Added logging, fixed MongoDB connection, updated Docker compose, and initial wallet stats endpoint)
