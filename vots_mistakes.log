@@ -1,0 +1,11 @@
+Sat Jan  4 12:59:38 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 13:02:22 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 13:39:08 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 13:53:42 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 13:59:30 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 14:06:01 EST 2025 [WARN] OPENAI_API_KEY not set, skipping AI summary.
+Sat Jan  4 16:02:38 EST 2025 [WARN] Not all containers became healthy within 90 seconds.
+Sat Jan  4 16:02:38 EST 2025 [WARN] solana_agents => host port 4000 not open
+Sat Jan  4 16:02:39 EST 2025 [WARN] solana_agents => /health check failed on localhost:4000
+Sat Jan  4 16:02:39 EST 2025 [WARN] solana_agents => found 4 matches for error|exception|traceback|fail
+Sat Jan  4 16:02:39 EST 2025 [WARN] mongo => found 2 matches for error|exception|traceback|fail

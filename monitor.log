@@ -1,0 +1,8 @@
+Sat Jan  4 09:28:03 EST 2025 [WARN] Not all containers became healthy within 90 seconds.
+Sat Jan  4 09:28:03 EST 2025 [WARN] solana_agents is 'healthy' but port 4000 not open on IP 
+Sat Jan  4 09:28:03 EST 2025 [WARN] ragchain_service is 'healthy' but port 5000 not open on IP 
+Sat Jan  4 09:28:03 EST 2025 [WARN] quant_service is 'healthy' but port 7000 not open on IP 
+Sat Jan  4 09:28:04 EST 2025 [WARN] solana_agents => /health check failed
+Sat Jan  4 09:28:04 EST 2025 [WARN] ragchain_service => /health check failed
+Sat Jan  4 09:28:04 EST 2025 [WARN] quant_service => /health check failed
+Sat Jan  4 09:28:07 EST 2025 [WARN] Python 'openai' library not found. Skipping AI summary. (pip install openai)

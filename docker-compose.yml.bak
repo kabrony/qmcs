@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  solana_agents:
+    build:
+      context: ./solana_agents
+      dockerfile: Dockerfile
+    # container_name: solana_agents
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      RAGCHAIN_URL: http://ragchain-service:5000
+      QUANT_URL: http://quant-service:7000
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL}
+      SOLANA_PRIVATE_KEY: ${SOLANA_PRIVATE_KEY}
+    depends_on:
+      - ragchain-service
+      - quant-service
+    networks:
+      - app-network
+
+  ragchain-service:
+    build:
+      context: ./ragchain_service
+      dockerfile: Dockerfile
+    # container_name: ragchain_service
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      MONGO_DETAILS: ${MONGO_DETAILS}
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  quant-service:
+    build:
+      context: ./quant_service
+      dockerfile: Dockerfile
+    # container_name: quant_service
+    ports:
+      - "7000:7000"
+    environment:
+      PORT: 7000
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    # container_name: local_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  mongo_data:
+
+networks:
+  app-network:
+    name: solais-network

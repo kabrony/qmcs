@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  openai_service:
+    build:
+      context: ./openai_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3001:3001"
+    networks:
+      - sol-ai-net
+
+  solana_agents:
+    build:
+      context: ./solana_agents
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4000:4000"
+    networks:
+      - sol-ai-net
+
+  solana_trader:
+    build:
+      context: ./solana_trader
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4500:4500"
+    networks:
+      - sol-ai-net
+
+  quant_service:
+    build:
+      context: ./quant_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "7000:7000"
+    networks:
+      - sol-ai-net
+
+  ragchain_service:
+    build:
+      context: ./ragchain_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - sol-ai-net
+
+  oracle_service:
+    build:
+      context: ./oracle_service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "6000:6000"
+    networks:
+      - sol-ai-net
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - sol-ai-net
+
+volumes:
+  mongo_data:
+
+networks:
+  sol-ai-net:
+    name: sol-ai-clean-network

@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -e
+
+# --- Configuration ---
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_RED='\033[0;31m'
+COLOR_NC='\033[0m' # No Color
+
+log_info()  { echo -e "${COLOR_GREEN}[INFO] $@${COLOR_NC}"; }
+log_warn()  { echo -e "${COLOR_YELLOW}[WARN] $@${COLOR_NC}"; }
+log_error() { echo -e "${COLOR_RED}[ERROR] $@${COLOR_NC}"; }
+
+# --- Helper Functions ---
+
+# Function to display file content with optional line numbers
+smart_cat() {
+  local file="$1"
+  local line_numbers="${2:-false}"
+
+  if [ ! -f "$file" ]; then
+    log_error "File not found: $file"
+    return 1
+  fi
+
+  log_info "Displaying content of: $file"
+  if [[ "$line_numbers" == "true" ]]; then
+    cat -n "$file"
+  else
+    cat "$file"
+  fi
+}
+
+# Function to inspect Docker logs of a specific container
+inspect_logs() {
+  local container_name="$1"
+  local follow="${2:-false}"
+
+  if ! docker container inspect -s "$container_name" > /dev/null 2>&1; then
+    log_error "Container not found or not running: $container_name"
+    return 1
+  fi
+
+  log_info "Inspecting logs for container: $container_name"
+  if [[ "$follow" == "true" ]]; then
+    docker logs -f "$container_name"
+  else
+    docker logs "$container_name"
+  fi
+}
+
+# Function to peek at environment variables of a running container
+peek_env() {
+  local container_name="$1"
+
+  if ! docker container inspect -s "$container_name" > /dev/null 2>&1; then
+    log_error "Container not found or not running: $container_name"
+    return 1
+  fi
+
+  log_info "Peeking at environment variables for container: $container_name"
+  docker exec "$container_name" printenv
+}
+
+# Function to execute a command inside a Docker container and show the output
+exec_in_container() {
+  local container_name="$1"
+  shift # Remove container name from arguments
+  local command="$@"
+
+  if [ -z "$command" ]; then
+    log_error "No command specified to execute in container: $container_name"
+    return 1
+  fi
+
+  if ! docker container inspect -s "$container_name" > /dev/null 2>&1; then
+    log_error "Container not found or not running: $container_name"
+    return 1
+  fi
+
+  log_info "Executing command in $container_name: '$command'"
+  docker exec "$container_name" sh -c "$command"
+}
+
+# --- Main Script ---
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <action> [options]"
+  echo ""
+  echo "Actions:"
+  echo "  view <file> [-n]: View file content (optional line numbers)"
+  echo "  logs <container_name> [-f]: Inspect container logs (optional follow)"
+  echo "  env <container_name>: Peek at container environment variables"
+  echo "  exec <container_name> <command>: Execute a command inside a container"
+  echo "  help: Show this help message"
+  exit 1
+fi
+
+action="$1"
+shift
+
+case "$action" in
+  "view")
+    file="$1"
+    line_numbers="false"
+    shift
+    if [[ "$1" == "-n" ]]; then
+      line_numbers="true"
+    fi
+    smart_cat "$file" "$line_numbers"
+    ;;
+  "logs")
+    container_name="$1"
+    follow="false"
+    shift
+    if [[ "$1" == "-f" ]]; then
+      follow="true"
+    fi
+    inspect_logs "$container_name" "$follow"
+    ;;
+  "env")
+    container_name="$1"
+    peek_env "$container_name"
+    ;;
+  "exec")
+    container_name="$1"
+    shift
+    exec_in_container "$container_name" "$@"
+    ;;
+  "help")
+    $0
+    ;;
+  *)
+    log_error "Unknown action: $action"
+    echo "Run '$0 help' for usage information."
+    exit 1
+    ;;
+esac
+
+exit 0

@@ -1,15 +1,6 @@
-FROM node:20-alpine
-
-RUN apk update && apk add --no-cache git bash grep sed curl
-
+FROM node:18-slim
 WORKDIR /app
-
-COPY package.json patch_solana_agent.sh ./
+COPY package.json /app/
 RUN npm install
-
-RUN chmod +x patch_solana_agent.sh && ./patch_solana_agent.sh || echo "[solana_agents] No patch needed"
-
-COPY . .
-
-EXPOSE 4000
-CMD ["node", "index.js"]
+COPY . /app
+CMD ["npm", "start"]

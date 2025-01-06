@@ -1,41 +1,22 @@
 require('dotenv').config();
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { Connection, PublicKey } = require('@solana/web3.js');
 
 const app = express();
 app.use(express.json());
 
-const port = 4000;
-const MONGO_DETAILS = process.env.MONGO_DETAILS || '';
-const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+const PORT = process.env.PORT || 4000;
+const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || "";
+const SOLANA_PRIVATE_KEY = process.env.SOLANA_PRIVATE_KEY || "";
+const SOLANA_PUBLIC_KEY = process.env.SOLANA_PUBLIC_KEY || "";
 
-let mongoDB = null;
+console.log("[INFO] Starting solana_agents service...");
+console.log("[INFO] Using SOLANA_RPC_URL:", SOLANA_RPC_URL);
 
-// Print a quick test to confirm code is updated:
-console.log("[solana_agents] CODE TEST -> If you see this, code was updated.");
-
-// Initialize Mongo
-(async function initMongo() {
-  if (!MONGO_DETAILS) {
-    console.log("[solana_agents] No MONGO_DETAILS provided");
-    return;
-  }
-  try {
-    console.log("[solana_agents] Using MONGO_DETAILS:", MONGO_DETAILS.replace(/:[^:]*@/, ':****@'));
-    const client = new MongoClient(MONGO_DETAILS, { serverSelectionTimeoutMS: 8000 });
-    await client.connect();
-    mongoDB = client.db();
-    console.log("[solana_agents] MongoDB connected successfully!");
-  } catch (err) {
-    console.error("[solana_agents] MongoDB connection error:", err.message);
-  }
-})();
-
-// Health
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', rpc: SOLANA_RPC_URL });
+  res.json({status: "ok", publicKey: SOLANA_PUBLIC_KEY});
 });
 
-app.listen(port, () => {
-  console.log(`[solana_agents] listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`[INFO] solana_agents listening on port ${PORT}`);
 });

@@ -1,0 +1,16 @@
+# For advanced memory with LangChain + Chroma:
+langchain>=0.0.200
+langchain-chroma>=0.0.2
+langchain-openai>=0.0.7
+langchain-community>=0.0.4
+
+# The latest OpenAI library (1.0+):
+openai>=1.0.0
+
+# Basic Python + FastAPI + etc
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx

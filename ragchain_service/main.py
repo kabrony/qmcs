@@ -1,54 +1,32 @@
 import os
-import logging
+import openai
+from dotenv import load_dotenv
 from fastapi import FastAPI
-import uvicorn
-from pymongo import MongoClient
+
+load_dotenv()  # loads .env
+
+# We'll set openai.api_key explicitly for openai>=1.0
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
-MONGO_DETAILS = os.getenv('MONGO_DETAILS', '')
+@app.get("/")
+async def root():
+    return {"service": "ragchain_service", "status": "OK"}
 
-print("[ragchain_service] CODE TEST -> If you see this, code was updated.")
-
-@app.on_event("startup")
-def startup_db_client():
-    global mongo_client, db
-    logger.info(f"[ragchain_service] Attempting to connect. URI: {MONGO_DETAILS}")
-    if not MONGO_DETAILS:
-        logger.error("[ragchain_service] MONGO_DETAILS not set.")
-        return
+@app.get("/test_openai")
+async def test_openai():
+    """
+    Minimal usage for openai>=1.0:
+    Using ChatCompletion endpoint with GPT-3.5.
+    """
     try:
-        mongo_client = MongoClient(MONGO_DETAILS)
-        db = mongo_client.get_default_database()
-        logger.info("[ragchain_service] MongoDB connected successfully")
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role":"user","content": "Say hello from the new library."}],
+            temperature=0.7,
+        )
+        msg = response.choices[0].message.content.strip()
+        return {"response": msg}
     except Exception as e:
-        logger.error(f"[ragchain_service] MongoDB connection error: {e}")
-
-@app.on_event("shutdown")
-def shutdown_db_client():
-    if 'mongo_client' in globals():
-        mongo_client.close()
-        logger.info("[ragchain_service] MongoDB connection closed.")
-
-@app.get("/health")
-def health():
-    return {"status": "ragchain_service OK"}
-
-@app.get("/analyze-wallet/{address}")
-def analyze_wallet(address: str):
-    if 'db' not in globals() or db is None:
-        return {"error": "DB not connected"}
-    wallets_coll = db.get_collection("wallets")
-    doc = wallets_coll.find_one({"address": address})
-    if not doc:
-        return {"error": "No such wallet in DB"}
-    return {
-        "address": doc.get("address"),
-        "balance": doc.get("balance", 0),
-        "tx_count": len(doc.get("recentTransactions", []))
-    }
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+        return {"error": str(e)}

@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import requests
+import openai
+from fastapi import FastAPI
+import uvicorn
+
+app = FastAPI()
+
+MONGO_DETAILS     = os.getenv("MONGO_DETAILS", "")
+SOLANA_RPC_URL    = os.getenv("SOLANA_RPC_URL", "")
+SOLANA_PRIVATE_KEY= os.getenv("SOLANA_PRIVATE_KEY", "")
+OPENAI_API_KEY    = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY    = os.getenv("GEMINI_API_KEY", "")
+DEEPSEEK_API_KEY  = os.getenv("DEEPSEEK_API_KEY", "")
+TAVILY_API_KEY    = os.getenv("TAVILY_API_KEY", "")
+
+@app.on_event("startup")
+def startup_env_check():
+    print("[quant_service] CODE TEST -> If you see this, code was updated.")
+    # Example logs
+    if MONGO_DETAILS:
+        print(f"[quant_service] MONGO_DETAILS truncated: {MONGO_DETAILS[:30]}...")
+    else:
+        print("[quant_service] MONGO_DETAILS not set.")
+
+    if OPENAI_API_KEY:
+        print("[quant_service] OPENAI_API_KEY found. We'll try GPT-4 with openai==0.28.0.")
+    else:
+        print("[quant_service] No OPENAI_API_KEY. GPT-4 calls will fail or skip.")
+
+@app.get("/health")
+def health():
+    return {"status": "quant_service OK"}
+
+@app.get("/report")
+def report():
+    if not OPENAI_API_KEY:
+        return {"error": "No OPENAI_API_KEY. Can't call GPT-4."}
+
+    openai.api_key = OPENAI_API_KEY
+    try:
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful system. We have Solana + AI + Quant."},
+                {"role": "user", "content": "Please confirm environment-based code is working."}
+            ],
+            max_tokens=100,
+            temperature=0.7
+        )
+        text = response.choices[0].message["content"]
+        return {"report": text}
+    except Exception as e:
+        print(f"[ERROR] GPT-4 call failed: {e}")
+        return {"error": str(e)}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=7000, reload=False)

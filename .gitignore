@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-.env
-.env
+venv/
 __pycache__/
-=======
-.env.save
-.env_backup_20250103_164432
->>>>>>> ad2001f2 (Update: Added logging, fixed MongoDB connection, updated Docker compose, and initial wallet stats endpoint)
+*.pyc
+*.pyo

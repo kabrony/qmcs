@@ -1,5 +1,6 @@
 services:
 <<<<<<< HEAD
+<<<<<<< HEAD
   trilogy_app:
     build: .
     image: trilogy_app_image:latest
@@ -18,40 +19,61 @@ services:
       - SOLANA_RPC_URL=${SOLANA_RPC_URL}
       - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
       - MONGO_DETAILS=${MONGO_DETAILS}
+=======
+  mongo:
+    image: mongo:latest
+    container_name: qmcs-mongo
+>>>>>>> 4632db42 (Add Argus as submodule)
     ports:
-      - "4000:4000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:4000/health"]
-      interval: 30s
-      retries: 3
+      - "27017:27017"
 
-  ragchain_service:
-    build:
-      context: ./ragchain_service
-      dockerfile: Dockerfile
-    container_name: ragchain_service
+  solana_agents:
+    build: ./solana_agents
+    container_name: qmcs-solana_agents
     ports:
-      - "5000:5000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:5000/health"]
-      interval: 30s
-      retries: 3
+      - "5106:4000"
+
+  argus_service:
+    build: ./argus_service
+    container_name: argus_service
+    ports:
+      - "5101:5000"
+
+  oracle_service:
+    build: ./oracle_service
+    container_name: oracle_service
+    ports:
+      - "5102:5000"
+
+  openai_service:
+    build: ./openai_service
+    container_name: openai_service
+    ports:
+      - "5103:5000"
+    # Add environment file if needed:
+    env_file:
+      - .env
+    volumes:
+      - chroma_data:/app/chroma_storage
 
   quant_service:
-    build:
-      context: ./quant_service
-      dockerfile: Dockerfile
+    build: ./quant_service
     container_name: quant_service
-    environment:
-      - MONGO_DETAILS=${MONGO_DETAILS}
     ports:
-      - "7000:7000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:7000/health"]
-      interval: 30s
-      retries: 3
+      - "5104:5000"
 
+<<<<<<< HEAD
 networks:
   default:
     driver: bridge
 >>>>>>> ad2001f2 (Update: Added logging, fixed MongoDB connection, updated Docker compose, and initial wallet stats endpoint)
+=======
+  ragchain_service:
+    build: ./ragchain_service
+    container_name: ragchain_service
+    ports:
+      - "5105:5000"
+
+volumes:
+  chroma_data:
+>>>>>>> 4632db42 (Add Argus as submodule)
