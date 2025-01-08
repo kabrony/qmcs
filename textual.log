@@ -1,0 +1,7 @@
+---
+driver=<class 'textual.drivers.linux_driver.LinuxDriver'>
+Load() >>> DockerMatrixApp(title='Textual')
+Mount() >>> DockerMatrixApp(title='Docker Legacy Matrix')
+CLOSED DockerMatrixApp(title='Docker Matrix (Legacy Textual)')
+PROCESS END
+Mount() >>> DockView(name='DockView#1')

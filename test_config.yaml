@@ -1,0 +1,53 @@
+services:
+  openai_service:
+    name: "openai"
+    port: 5103
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies: []
+
+  oracle_service:
+    name: "oracle"
+    port: 5102
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies: []
+
+  ragchain_service:
+    name: "ragchain"
+    port: 5105
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies: []
+
+  quant_service:
+    name: "quant"
+    port: 5104
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies:
+      - "oracle_service"
+      - "ragchain_service"
+      - "openai_service"
+
+  solana_agents:
+    name: "solana"
+    port: 5106
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies: []
+
+  argus_service:
+    name: "argus"
+    port: 5101
+    health_endpoint: "/health"
+    health_timeout: 10
+    dependencies: []
+
+mongodb:
+  uri: "mongodb://qmcs-mongo:27017"
+  db_name: "memory_store"
+
+test_settings:
+  environment: "local"
+  integration_timeout: 15

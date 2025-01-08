@@ -1,16 +1,10 @@
-import os
-import openai
-from dotenv import load_dotenv
+from fastapi import FastAPI
+from langchain.text_splitter import CharacterTextSplitter
 
-def main():
-    load_dotenv()
-    openai.api_key = os.getenv("OPENAI_API_KEY", "DUMMY_KEY")
-    # New usage for openai >= 1.0.0
-    response = openai.chat_complete(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": "Hello from new openai library!"}]
-    )
-    print(response["choices"][0]["message"]["content"])
+app = FastAPI()
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+def read_root():
+    splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=10)
+    chunks = splitter.split_text("Hello, World!")
+    return {"chunks": chunks}

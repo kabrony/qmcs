@@ -1,0 +1,4 @@
+[INFO] Starting fix_solana_agents_syntax.sh...
+[INFO] Backing up solana_agents/index.js to solana_agents/index.js.bak
+[INFO] Post-cleanup line count check:
+103 solana_agents/index.js

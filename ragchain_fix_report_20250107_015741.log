@@ -1,0 +1,883 @@
+========== [ Script: fix_ragchain_no_langchain.sh ] ==========
+[STEP 1] Display current ragchain_service/main.py contents
+--------------------------------------------------------
+import os
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from tenacity import retry, stop_after_attempt, wait_fixed
+import asyncio
+from datetime import datetime
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_core.documents import Document
+import openai
+import uvicorn
+import logging
+from fastapi import FastAPI
+import google.generativeai as genai
+
+load_dotenv()
+app = FastAPI()
+
+MONGO_URL = os.getenv("MONGO_URL","mongodb://mongo:27017")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+db_client = None
+ephemeral_thoughts = []
+
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Model options: "gemini-pro", "gemini-ultra" (if available)
+gemini_model = genai.GenerativeModel('gemini-pro')
+
+
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
+async def connect_to_mongo():
+    global db_client
+    db_client = AsyncIOMotorClient(MONGO_URL)
+    result = await db_client.admin.command("ping")
+    logging.info(f"[ragchain_service] ping: {result}")
+
+@app.on_event("startup")
+async def startup_event():
+    await connect_to_mongo()
+    logging.info("[ragchain_service] Connected to Mongo (async).")
+
+@app.get("/")
+async def root():
+    return {"status":"ragchain_service running"}
+
+@app.get("/health")
+async def health():
+    return {"status":"ok", "service":"ragchain_service"}
+
+@app.post("/store_thought/")
+async def store_thought(thought: str):
+    global ephemeral_thoughts
+    ephemeral_thoughts.append({
+        "id": len(ephemeral_thoughts),
+        "text": thought,
+        "time": str(datetime.now())
+    })
+    return {"message":"Stored Ephemeral Thought"}
+
+@app.get("/ephemeral_ideas")
+async def get_ephemeral_ideas():
+    return {"data": ephemeral_thoughts}
+
+@app.post("/add_doc")
+async def add_doc(text: str, chunk_size: int=200, chunk_overlap: int=20):
+    splitter = CharacterTextSplitter(
+        separator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+    chunks = splitter.split_text(text)
+    docs = [Document(page_content=chunk) for chunk in chunks]
+    vectorstore.add_documents(docs)
+    return {"message":"Stored Documents", "chunks": chunks}
+
+@app.post("/ask")
+async def ask(query: str, k: int=3, use_gemini: bool = False):
+    try:
+      if use_gemini:
+          response = gemini_model.generate_content(query)
+          ans = response.text
+          return {"answer": ans, "docsUsed":[]} # No document context with Gemini for now.
+      else:
+        relevant_docs = vectorstore.similarity_search(query, k=k or 3)
+        combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+        prompt = (
+            "You are an AI with knowledge from docs:\n"
+            f"{combined_text}\n\n"
+            "Answer user question. If not found, say 'unsure'."
+        )
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"system","content":prompt},
+                {"role":"user","content":query}
+            ],
+            temperature=0.7
+        )
+        ans = response.choices[0].message.content.strip() if response.choices[0].message else None
+        return {"answer": ans, "docsUsed":[d.page_content for d in relevant_docs]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000)
+
+[STEP 2] Modify the code to accept JSON body with Pydantic
+--------------------------------------------------------
+[INFO] Done adjusting main.py for JSON body usage. Backup at main.py.bak.
+
+[STEP 3] Rebuild Docker image (ragchain_service) with --no-cache
+--------------------------------------------------------
+ Service ragchain_service  Building
+#0 building with "default" instance using docker driver
+
+#1 [ragchain_service internal] load build definition from Dockerfile
+#1 transferring dockerfile: 419B 0.0s done
+#1 DONE 0.0s
+
+#2 [ragchain_service internal] load metadata for docker.io/library/python:3.12-slim
+#2 ...
+
+#3 [ragchain_service auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [ragchain_service internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.7s
+
+#4 [ragchain_service internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [ragchain_service 1/6] FROM docker.io/library/python:3.12-slim@sha256:10f3aaab98db50cba827d3b33a91f39dc9ec2d02ca9b85cbc5008220d07b17f3
+#5 DONE 0.0s
+
+#6 [ragchain_service 2/6] WORKDIR /app
+#6 CACHED
+
+#7 [ragchain_service internal] load build context
+#7 transferring context: 8.02kB done
+#7 DONE 0.0s
+
+#8 [ragchain_service 3/6] COPY requirements.txt /app/
+#8 DONE 0.0s
+
+#9 [ragchain_service 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#9 3.782 Collecting fastapi==0.109.2 (from -r requirements.txt (line 1))
+#9 3.844   Downloading fastapi-0.109.2-py3-none-any.whl.metadata (25 kB)
+#9 3.914 Collecting uvicorn (from -r requirements.txt (line 2))
+#9 3.919   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+#9 4.085 Collecting openai>=1.0.0 (from -r requirements.txt (line 3))
+#9 4.090   Downloading openai-1.59.3-py3-none-any.whl.metadata (27 kB)
+#9 4.127 Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 4))
+#9 4.131   Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+#9 4.200 Collecting chromadb (from -r requirements.txt (line 5))
+#9 4.206   Downloading chromadb-0.6.2-py3-none-any.whl.metadata (6.8 kB)
+#9 4.236 Collecting google-generativeai (from -r requirements.txt (line 6))
+#9 4.241   Downloading google_generativeai-0.8.3-py3-none-any.whl.metadata (3.9 kB)
+#9 4.273 Collecting motor (from -r requirements.txt (line 7))
+#9 4.281   Downloading motor-3.6.0-py3-none-any.whl.metadata (21 kB)
+#9 4.321 Collecting tenacity (from -r requirements.txt (line 8))
+#9 4.328   Downloading tenacity-9.0.0-py3-none-any.whl.metadata (1.2 kB)
+#9 4.395 Collecting requests (from -r requirements.txt (line 9))
+#9 4.407   Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+#9 4.766 Collecting pydantic (from -r requirements.txt (line 10))
+#9 4.772   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+#9 4.831 Collecting httpx (from -r requirements.txt (line 11))
+#9 4.837   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#9 4.894 Collecting langchain-openai (from -r requirements.txt (line 12))
+#9 4.900   Downloading langchain_openai-0.2.14-py3-none-any.whl.metadata (2.7 kB)
+#9 4.983 Collecting langchain-chroma (from -r requirements.txt (line 13))
+#9 4.989   Downloading langchain_chroma-0.1.4-py3-none-any.whl.metadata (1.6 kB)
+#9 5.335 Collecting langchain>=0.0.200 (from -r requirements.txt (line 14))
+#9 5.362   Downloading langchain-0.3.14-py3-none-any.whl.metadata (7.1 kB)
+#9 5.556 Collecting starlette<0.37.0,>=0.36.3 (from fastapi==0.109.2->-r requirements.txt (line 1))
+#9 5.556   Downloading starlette-0.36.3-py3-none-any.whl.metadata (5.9 kB)
+#9 5.600 Collecting typing-extensions>=4.8.0 (from fastapi==0.109.2->-r requirements.txt (line 1))
+#9 5.606   Downloading typing_extensions-4.12.2-py3-none-any.whl.metadata (3.0 kB)
+#9 5.663 Collecting click>=7.0 (from uvicorn->-r requirements.txt (line 2))
+#9 5.670   Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)
+#9 5.708 Collecting h11>=0.8 (from uvicorn->-r requirements.txt (line 2))
+#9 5.715   Downloading h11-0.14.0-py3-none-any.whl.metadata (8.2 kB)
+#9 5.786 Collecting anyio<5,>=3.5.0 (from openai>=1.0.0->-r requirements.txt (line 3))
+#9 5.786   Downloading anyio-4.8.0-py3-none-any.whl.metadata (4.6 kB)
+#9 5.827 Collecting distro<2,>=1.7.0 (from openai>=1.0.0->-r requirements.txt (line 3))
+#9 5.828   Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+#9 5.976 Collecting jiter<1,>=0.4.0 (from openai>=1.0.0->-r requirements.txt (line 3))
+#9 5.978   Downloading jiter-0.8.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+#9 6.080 Collecting sniffio (from openai>=1.0.0->-r requirements.txt (line 3))
+#9 6.086   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#9 6.242 Collecting tqdm>4 (from openai>=1.0.0->-r requirements.txt (line 3))
+#9 6.251   Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+#9 6.336 Collecting build>=1.0.3 (from chromadb->-r requirements.txt (line 5))
+#9 6.342   Downloading build-1.2.2.post1-py3-none-any.whl.metadata (6.5 kB)
+#9 6.436 Collecting chroma-hnswlib==0.7.6 (from chromadb->-r requirements.txt (line 5))
+#9 6.458   Downloading chroma_hnswlib-0.7.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (252 bytes)
+#9 6.997 Collecting numpy>=1.22.5 (from chromadb->-r requirements.txt (line 5))
+#9 7.003   Downloading numpy-2.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+#9 7.126 Collecting posthog>=2.4.0 (from chromadb->-r requirements.txt (line 5))
+#9 7.161   Downloading posthog-3.7.5-py2.py3-none-any.whl.metadata (2.0 kB)
+#9 7.328 Collecting onnxruntime>=1.14.1 (from chromadb->-r requirements.txt (line 5))
+#9 7.331   Downloading onnxruntime-1.20.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (4.5 kB)
+#9 7.392 Collecting opentelemetry-api>=1.2.0 (from chromadb->-r requirements.txt (line 5))
+#9 7.397   Downloading opentelemetry_api-1.29.0-py3-none-any.whl.metadata (1.4 kB)
+#9 7.443 Collecting opentelemetry-exporter-otlp-proto-grpc>=1.2.0 (from chromadb->-r requirements.txt (line 5))
+#9 7.461   Downloading opentelemetry_exporter_otlp_proto_grpc-1.29.0-py3-none-any.whl.metadata (2.2 kB)
+#9 7.512 Collecting opentelemetry-instrumentation-fastapi>=0.41b0 (from chromadb->-r requirements.txt (line 5))
+#9 7.522   Downloading opentelemetry_instrumentation_fastapi-0.50b0-py3-none-any.whl.metadata (2.1 kB)
+#9 7.591 Collecting opentelemetry-sdk>=1.2.0 (from chromadb->-r requirements.txt (line 5))
+#9 7.598   Downloading opentelemetry_sdk-1.29.0-py3-none-any.whl.metadata (1.5 kB)
+#9 8.146 Collecting tokenizers>=0.13.2 (from chromadb->-r requirements.txt (line 5))
+#9 8.152   Downloading tokenizers-0.21.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#9 8.227 Collecting pypika>=0.48.9 (from chromadb->-r requirements.txt (line 5))
+#9 8.231   Downloading PyPika-0.48.9.tar.gz (67 kB)
+#9 8.268   Installing build dependencies: started
+#9 12.38   Installing build dependencies: finished with status 'done'
+#9 12.39   Getting requirements to build wheel: started
+#9 12.81   Getting requirements to build wheel: finished with status 'done'
+#9 12.81   Preparing metadata (pyproject.toml): started
+#9 13.24   Preparing metadata (pyproject.toml): finished with status 'done'
+#9 13.30 Collecting overrides>=7.3.1 (from chromadb->-r requirements.txt (line 5))
+#9 13.31   Downloading overrides-7.7.0-py3-none-any.whl.metadata (5.8 kB)
+#9 13.41 Collecting importlib-resources (from chromadb->-r requirements.txt (line 5))
+#9 13.42   Downloading importlib_resources-6.5.2-py3-none-any.whl.metadata (3.9 kB)
+#9 14.64 Collecting grpcio>=1.58.0 (from chromadb->-r requirements.txt (line 5))
+#9 14.64   Downloading grpcio-1.69.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.9 kB)
+#9 14.74 Collecting bcrypt>=4.0.1 (from chromadb->-r requirements.txt (line 5))
+#9 14.74   Downloading bcrypt-4.2.1-cp39-abi3-manylinux_2_28_x86_64.whl.metadata (9.8 kB)
+#9 14.79 Collecting typer>=0.9.0 (from chromadb->-r requirements.txt (line 5))
+#9 14.80   Downloading typer-0.15.1-py3-none-any.whl.metadata (15 kB)
+#9 14.85 Collecting kubernetes>=28.1.0 (from chromadb->-r requirements.txt (line 5))
+#9 14.86   Downloading kubernetes-31.0.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#9 14.94 Collecting PyYAML>=6.0.0 (from chromadb->-r requirements.txt (line 5))
+#9 14.95   Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+#9 15.25 Collecting mmh3>=4.0.1 (from chromadb->-r requirements.txt (line 5))
+#9 15.26   Downloading mmh3-5.0.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (14 kB)
+#9 15.86 Collecting orjson>=3.9.12 (from chromadb->-r requirements.txt (line 5))
+#9 15.86   Downloading orjson-3.10.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+#9 16.06 Collecting rich>=10.11.0 (from chromadb->-r requirements.txt (line 5))
+#9 16.07   Downloading rich-13.9.4-py3-none-any.whl.metadata (18 kB)
+#9 16.11 Collecting google-ai-generativelanguage==0.6.10 (from google-generativeai->-r requirements.txt (line 6))
+#9 16.12   Downloading google_ai_generativelanguage-0.6.10-py3-none-any.whl.metadata (5.6 kB)
+#9 16.28 Collecting google-api-core (from google-generativeai->-r requirements.txt (line 6))
+#9 16.29   Downloading google_api_core-2.24.0-py3-none-any.whl.metadata (3.0 kB)
+#9 16.46 Collecting google-api-python-client (from google-generativeai->-r requirements.txt (line 6))
+#9 16.46   Downloading google_api_python_client-2.157.0-py2.py3-none-any.whl.metadata (6.7 kB)
+#9 16.66 Collecting google-auth>=2.15.0 (from google-generativeai->-r requirements.txt (line 6))
+#9 16.67   Downloading google_auth-2.37.0-py2.py3-none-any.whl.metadata (4.8 kB)
+#9 17.05 Collecting protobuf (from google-generativeai->-r requirements.txt (line 6))
+#9 17.06   Downloading protobuf-5.29.2-cp38-abi3-manylinux2014_x86_64.whl.metadata (592 bytes)
+#9 17.38 Collecting proto-plus<2.0.0dev,>=1.22.3 (from google-ai-generativelanguage==0.6.10->google-generativeai->-r requirements.txt (line 6))
+#9 17.39   Downloading proto_plus-1.25.0-py3-none-any.whl.metadata (2.2 kB)
+#9 18.36 Collecting pymongo<4.10,>=4.9 (from motor->-r requirements.txt (line 7))
+#9 18.37   Downloading pymongo-4.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (22 kB)
+#9 18.57 Collecting charset-normalizer<4,>=2 (from requests->-r requirements.txt (line 9))
+#9 18.59   Downloading charset_normalizer-3.4.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+#9 18.64 Collecting idna<4,>=2.5 (from requests->-r requirements.txt (line 9))
+#9 18.65   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+#9 18.77 Collecting urllib3<3,>=1.21.1 (from requests->-r requirements.txt (line 9))
+#9 18.78   Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+#9 18.85 Collecting certifi>=2017.4.17 (from requests->-r requirements.txt (line 9))
+#9 18.88   Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+#9 18.92 Collecting annotated-types>=0.6.0 (from pydantic->-r requirements.txt (line 10))
+#9 18.95   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+#9 20.74 Collecting pydantic-core==2.27.2 (from pydantic->-r requirements.txt (line 10))
+#9 20.75   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#9 20.83 Collecting httpcore==1.* (from httpx->-r requirements.txt (line 11))
+#9 20.86   Downloading httpcore-1.0.7-py3-none-any.whl.metadata (21 kB)
+#9 21.02 Collecting langchain-core<0.4.0,>=0.3.27 (from langchain-openai->-r requirements.txt (line 12))
+#9 21.03   Downloading langchain_core-0.3.29-py3-none-any.whl.metadata (6.3 kB)
+#9 21.18 Collecting tiktoken<1,>=0.7 (from langchain-openai->-r requirements.txt (line 12))
+#9 21.19   Downloading tiktoken-0.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#9 21.23 Collecting chromadb (from -r requirements.txt (line 5))
+#9 21.23   Downloading chromadb-0.5.23-py3-none-any.whl.metadata (6.8 kB)
+#9 21.30 Collecting numpy>=1.22.5 (from chromadb->-r requirements.txt (line 5))
+#9 21.31   Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+#9 21.37 Collecting tokenizers<=0.20.3,>=0.13.2 (from chromadb->-r requirements.txt (line 5))
+#9 21.38   Downloading tokenizers-0.20.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#9 22.09 Collecting SQLAlchemy<3,>=1.4 (from langchain>=0.0.200->-r requirements.txt (line 14))
+#9 22.10   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.7 kB)
+#9 23.20 Collecting aiohttp<4.0.0,>=3.8.3 (from langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.20   Downloading aiohttp-3.11.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+#9 23.24 Collecting langchain-text-splitters<0.4.0,>=0.3.3 (from langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.25   Downloading langchain_text_splitters-0.3.4-py3-none-any.whl.metadata (2.3 kB)
+#9 23.46 Collecting langsmith<0.3,>=0.1.17 (from langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.46   Downloading langsmith-0.2.10-py3-none-any.whl.metadata (14 kB)
+#9 23.61 Collecting aiohappyeyeballs>=2.3.0 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.61   Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl.metadata (6.1 kB)
+#9 23.63 Collecting aiosignal>=1.1.2 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.63   Downloading aiosignal-1.3.2-py2.py3-none-any.whl.metadata (3.8 kB)
+#9 23.67 Collecting attrs>=17.3.0 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.67   Downloading attrs-24.3.0-py3-none-any.whl.metadata (11 kB)
+#9 23.78 Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 23.79   Downloading frozenlist-1.5.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (13 kB)
+#9 24.13 Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 24.13   Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.0 kB)
+#9 24.19 Collecting propcache>=0.2.0 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 24.19   Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.2 kB)
+#9 24.78 Collecting yarl<2.0,>=1.17.0 (from aiohttp<4.0.0,>=3.8.3->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 24.79   Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (69 kB)
+#9 24.87 Collecting packaging>=19.1 (from build>=1.0.3->chromadb->-r requirements.txt (line 5))
+#9 24.88   Downloading packaging-24.2-py3-none-any.whl.metadata (3.2 kB)
+#9 24.89 Collecting pyproject_hooks (from build>=1.0.3->chromadb->-r requirements.txt (line 5))
+#9 24.89   Downloading pyproject_hooks-1.2.0-py3-none-any.whl.metadata (1.3 kB)
+#9 24.95 Collecting googleapis-common-protos<2.0.dev0,>=1.56.2 (from google-api-core->google-generativeai->-r requirements.txt (line 6))
+#9 24.95   Downloading googleapis_common_protos-1.66.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#9 25.15 Collecting cachetools<6.0,>=2.0.0 (from google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 6))
+#9 25.15   Downloading cachetools-5.5.0-py3-none-any.whl.metadata (5.3 kB)
+#9 25.19 Collecting pyasn1-modules>=0.2.1 (from google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 6))
+#9 25.20   Downloading pyasn1_modules-0.4.1-py3-none-any.whl.metadata (3.5 kB)
+#9 25.24 Collecting rsa<5,>=3.1.4 (from google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 6))
+#9 25.24   Downloading rsa-4.9-py3-none-any.whl.metadata (4.2 kB)
+#9 25.30 Collecting six>=1.9.0 (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.30   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#9 25.33 Collecting python-dateutil>=2.5.3 (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.34   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+#9 25.47 Collecting websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.47   Downloading websocket_client-1.8.0-py3-none-any.whl.metadata (8.0 kB)
+#9 25.50 Collecting requests-oauthlib (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.51   Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+#9 25.54 Collecting oauthlib>=3.2.2 (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.55   Downloading oauthlib-3.2.2-py3-none-any.whl.metadata (7.5 kB)
+#9 25.59 Collecting durationpy>=0.7 (from kubernetes>=28.1.0->chromadb->-r requirements.txt (line 5))
+#9 25.60   Downloading durationpy-0.9-py3-none-any.whl.metadata (338 bytes)
+#9 25.64 Collecting jsonpatch<2.0,>=1.33 (from langchain-core<0.4.0,>=0.3.27->langchain-openai->-r requirements.txt (line 12))
+#9 25.65   Downloading jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+#9 25.78 Collecting requests-toolbelt<2.0.0,>=1.0.0 (from langsmith<0.3,>=0.1.17->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 25.79   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+#9 25.88 Collecting coloredlogs (from onnxruntime>=1.14.1->chromadb->-r requirements.txt (line 5))
+#9 25.88   Downloading coloredlogs-15.0.1-py2.py3-none-any.whl.metadata (12 kB)
+#9 25.90 Collecting flatbuffers (from onnxruntime>=1.14.1->chromadb->-r requirements.txt (line 5))
+#9 25.91   Downloading flatbuffers-24.12.23-py2.py3-none-any.whl.metadata (876 bytes)
+#9 25.97 Collecting sympy (from onnxruntime>=1.14.1->chromadb->-r requirements.txt (line 5))
+#9 25.98   Downloading sympy-1.13.3-py3-none-any.whl.metadata (12 kB)
+#9 26.02 Collecting deprecated>=1.2.6 (from opentelemetry-api>=1.2.0->chromadb->-r requirements.txt (line 5))
+#9 26.02   Downloading Deprecated-1.2.15-py2.py3-none-any.whl.metadata (5.5 kB)
+#9 26.14 Collecting importlib-metadata<=8.5.0,>=6.0 (from opentelemetry-api>=1.2.0->chromadb->-r requirements.txt (line 5))
+#9 26.15   Downloading importlib_metadata-8.5.0-py3-none-any.whl.metadata (4.8 kB)
+#9 26.24 Collecting opentelemetry-exporter-otlp-proto-common==1.29.0 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb->-r requirements.txt (line 5))
+#9 26.24   Downloading opentelemetry_exporter_otlp_proto_common-1.29.0-py3-none-any.whl.metadata (1.8 kB)
+#9 26.28 Collecting opentelemetry-proto==1.29.0 (from opentelemetry-exporter-otlp-proto-grpc>=1.2.0->chromadb->-r requirements.txt (line 5))
+#9 26.29   Downloading opentelemetry_proto-1.29.0-py3-none-any.whl.metadata (2.3 kB)
+#9 26.45 Collecting opentelemetry-instrumentation-asgi==0.50b0 (from opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.46   Downloading opentelemetry_instrumentation_asgi-0.50b0-py3-none-any.whl.metadata (1.9 kB)
+#9 26.50 Collecting opentelemetry-instrumentation==0.50b0 (from opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.50   Downloading opentelemetry_instrumentation-0.50b0-py3-none-any.whl.metadata (6.1 kB)
+#9 26.54 Collecting opentelemetry-semantic-conventions==0.50b0 (from opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.54   Downloading opentelemetry_semantic_conventions-0.50b0-py3-none-any.whl.metadata (2.3 kB)
+#9 26.58 Collecting opentelemetry-util-http==0.50b0 (from opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.59   Downloading opentelemetry_util_http-0.50b0-py3-none-any.whl.metadata (2.5 kB)
+#9 26.79 Collecting wrapt<2.0.0,>=1.0.0 (from opentelemetry-instrumentation==0.50b0->opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.81   Downloading wrapt-1.17.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.4 kB)
+#9 26.86 Collecting asgiref~=3.0 (from opentelemetry-instrumentation-asgi==0.50b0->opentelemetry-instrumentation-fastapi>=0.41b0->chromadb->-r requirements.txt (line 5))
+#9 26.87   Downloading asgiref-3.8.1-py3-none-any.whl.metadata (9.3 kB)
+#9 26.97 Collecting monotonic>=1.5 (from posthog>=2.4.0->chromadb->-r requirements.txt (line 5))
+#9 26.98   Downloading monotonic-1.6-py2.py3-none-any.whl.metadata (1.5 kB)
+#9 27.01 Collecting backoff>=1.10.0 (from posthog>=2.4.0->chromadb->-r requirements.txt (line 5))
+#9 27.01   Downloading backoff-2.2.1-py3-none-any.whl.metadata (14 kB)
+#9 27.06 Collecting dnspython<3.0.0,>=1.16.0 (from pymongo<4.10,>=4.9->motor->-r requirements.txt (line 7))
+#9 27.06   Downloading dnspython-2.7.0-py3-none-any.whl.metadata (5.8 kB)
+#9 27.13 Collecting markdown-it-py>=2.2.0 (from rich>=10.11.0->chromadb->-r requirements.txt (line 5))
+#9 27.13   Downloading markdown_it_py-3.0.0-py3-none-any.whl.metadata (6.9 kB)
+#9 27.20 Collecting pygments<3.0.0,>=2.13.0 (from rich>=10.11.0->chromadb->-r requirements.txt (line 5))
+#9 27.22   Downloading pygments-2.19.1-py3-none-any.whl.metadata (2.5 kB)
+#9 27.69 Collecting greenlet!=0.4.17 (from SQLAlchemy<3,>=1.4->langchain>=0.0.200->-r requirements.txt (line 14))
+#9 27.70   Downloading greenlet-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#9 28.51 Collecting regex>=2022.1.18 (from tiktoken<1,>=0.7->langchain-openai->-r requirements.txt (line 12))
+#9 28.52   Downloading regex-2024.11.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (40 kB)
+#9 28.64 Collecting huggingface-hub<1.0,>=0.16.4 (from tokenizers<=0.20.3,>=0.13.2->chromadb->-r requirements.txt (line 5))
+#9 28.65   Downloading huggingface_hub-0.27.1-py3-none-any.whl.metadata (13 kB)
+#9 28.76 Collecting shellingham>=1.3.0 (from typer>=0.9.0->chromadb->-r requirements.txt (line 5))
+#9 28.76   Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+#9 28.86 Collecting httptools>=0.6.3 (from uvicorn[standard]>=0.18.3->chromadb->-r requirements.txt (line 5))
+#9 28.86   Downloading httptools-0.6.4-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
+#9 28.98 Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]>=0.18.3->chromadb->-r requirements.txt (line 5))
+#9 28.99   Downloading uvloop-0.21.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+#9 29.14 Collecting watchfiles>=0.13 (from uvicorn[standard]>=0.18.3->chromadb->-r requirements.txt (line 5))
+#9 29.15   Downloading watchfiles-1.0.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+#9 29.36 Collecting websockets>=10.4 (from uvicorn[standard]>=0.18.3->chromadb->-r requirements.txt (line 5))
+#9 29.36   Downloading websockets-14.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#9 29.40 Collecting httplib2<1.dev0,>=0.19.0 (from google-api-python-client->google-generativeai->-r requirements.txt (line 6))
+#9 29.41   Downloading httplib2-0.22.0-py3-none-any.whl.metadata (2.6 kB)
+#9 29.53 Collecting google-auth-httplib2<1.0.0,>=0.2.0 (from google-api-python-client->google-generativeai->-r requirements.txt (line 6))
+#9 29.53   Downloading google_auth_httplib2-0.2.0-py2.py3-none-any.whl.metadata (2.2 kB)
+#9 29.68 Collecting uritemplate<5,>=3.0.1 (from google-api-python-client->google-generativeai->-r requirements.txt (line 6))
+#9 29.69   Downloading uritemplate-4.1.1-py2.py3-none-any.whl.metadata (2.9 kB)
+#9 29.91 Collecting grpcio-status<2.0.dev0,>=1.33.2 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.10->google-generativeai->-r requirements.txt (line 6))
+#9 29.92   Downloading grpcio_status-1.69.0-py3-none-any.whl.metadata (1.1 kB)
+#9 30.07 Collecting pyparsing!=3.0.0,!=3.0.1,!=3.0.2,!=3.0.3,<4,>=2.4.2 (from httplib2<1.dev0,>=0.19.0->google-api-python-client->google-generativeai->-r requirements.txt (line 6))
+#9 30.08   Downloading pyparsing-3.2.1-py3-none-any.whl.metadata (5.0 kB)
+#9 30.17 Collecting filelock (from huggingface-hub<1.0,>=0.16.4->tokenizers<=0.20.3,>=0.13.2->chromadb->-r requirements.txt (line 5))
+#9 30.17   Downloading filelock-3.16.1-py3-none-any.whl.metadata (2.9 kB)
+#9 30.25 Collecting fsspec>=2023.5.0 (from huggingface-hub<1.0,>=0.16.4->tokenizers<=0.20.3,>=0.13.2->chromadb->-r requirements.txt (line 5))
+#9 30.25   Downloading fsspec-2024.12.0-py3-none-any.whl.metadata (11 kB)
+#9 30.41 Collecting zipp>=3.20 (from importlib-metadata<=8.5.0,>=6.0->opentelemetry-api>=1.2.0->chromadb->-r requirements.txt (line 5))
+#9 30.41   Downloading zipp-3.21.0-py3-none-any.whl.metadata (3.7 kB)
+#9 30.45 Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.33->langchain-core<0.4.0,>=0.3.27->langchain-openai->-r requirements.txt (line 12))
+#9 30.46   Downloading jsonpointer-3.0.0-py2.py3-none-any.whl.metadata (2.3 kB)
+#9 30.48 Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=10.11.0->chromadb->-r requirements.txt (line 5))
+#9 30.49   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+#9 30.70 Collecting pyasn1<0.7.0,>=0.4.6 (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-generativeai->-r requirements.txt (line 6))
+#9 30.71   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+#9 30.96 Collecting humanfriendly>=9.1 (from coloredlogs->onnxruntime>=1.14.1->chromadb->-r requirements.txt (line 5))
+#9 30.97   Downloading humanfriendly-10.0-py2.py3-none-any.whl.metadata (9.2 kB)
+#9 31.05 Collecting mpmath<1.4,>=1.1.0 (from sympy->onnxruntime>=1.14.1->chromadb->-r requirements.txt (line 5))
+#9 31.06   Downloading mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)
+#9 31.41 Downloading fastapi-0.109.2-py3-none-any.whl (92 kB)
+#9 31.42 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#9 31.43 Downloading openai-1.59.3-py3-none-any.whl (454 kB)
+#9 31.45 Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+#9 31.46 Downloading chroma_hnswlib-0.7.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.4 MB)
+#9 31.49    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 109.5 MB/s eta 0:00:00
+#9 31.50 Downloading google_generativeai-0.8.3-py3-none-any.whl (160 kB)
+#9 31.52 Downloading google_ai_generativelanguage-0.6.10-py3-none-any.whl (760 kB)
+#9 31.53    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 760.0/760.0 kB 357.2 MB/s eta 0:00:00
+#9 31.54 Downloading motor-3.6.0-py3-none-any.whl (74 kB)
+#9 31.54 Downloading tenacity-9.0.0-py3-none-any.whl (28 kB)
+#9 31.55 Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+#9 31.57 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#9 31.59 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+#9 31.61    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 328.2 MB/s eta 0:00:00
+#9 31.63 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#9 31.65 Downloading httpcore-1.0.7-py3-none-any.whl (78 kB)
+#9 31.66 Downloading langchain_openai-0.2.14-py3-none-any.whl (50 kB)
+#9 31.67 Downloading langchain_chroma-0.1.4-py3-none-any.whl (10 kB)
+#9 31.68 Downloading chromadb-0.5.23-py3-none-any.whl (628 kB)
+#9 31.70    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 628.3/628.3 kB 319.3 MB/s eta 0:00:00
+#9 31.71 Downloading langchain-0.3.14-py3-none-any.whl (1.0 MB)
+#9 31.72    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 334.6 MB/s eta 0:00:00
+#9 31.73 Downloading aiohttp-3.11.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+#9 31.77    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 278.2 MB/s eta 0:00:00
+#9 31.78 Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+#9 31.79 Downloading anyio-4.8.0-py3-none-any.whl (96 kB)
+#9 31.80 Downloading bcrypt-4.2.1-cp39-abi3-manylinux_2_28_x86_64.whl (278 kB)
+#9 31.82 Downloading build-1.2.2.post1-py3-none-any.whl (22 kB)
+#9 31.83 Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+#9 31.83 Downloading charset_normalizer-3.4.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (145 kB)
+#9 31.84 Downloading click-8.1.8-py3-none-any.whl (98 kB)
+#9 31.86 Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#9 31.86 Downloading google_api_core-2.24.0-py3-none-any.whl (158 kB)
+#9 31.87 Downloading google_auth-2.37.0-py2.py3-none-any.whl (209 kB)
+#9 31.88 Downloading grpcio-1.69.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.9 MB)
+#9 31.91    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.9/5.9 MB 275.7 MB/s eta 0:00:00
+#9 31.91 Downloading h11-0.14.0-py3-none-any.whl (58 kB)
+#9 31.92 Downloading idna-3.10-py3-none-any.whl (70 kB)
+#9 31.93 Downloading jiter-0.8.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (345 kB)
+#9 31.94 Downloading kubernetes-31.0.0-py2.py3-none-any.whl (1.9 MB)
+#9 31.95    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 346.0 MB/s eta 0:00:00
+#9 31.96 Downloading langchain_core-0.3.29-py3-none-any.whl (411 kB)
+#9 31.96 Downloading langchain_text_splitters-0.3.4-py3-none-any.whl (27 kB)
+#9 31.98 Downloading langsmith-0.2.10-py3-none-any.whl (326 kB)
+#9 32.00 Downloading mmh3-5.0.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (94 kB)
+#9 32.04 Downloading numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.0 MB)
+#9 32.23    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.0/18.0 MB 109.6 MB/s eta 0:00:00
+#9 32.24 Downloading onnxruntime-1.20.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (13.3 MB)
+#9 32.32    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.3/13.3 MB 177.7 MB/s eta 0:00:00
+#9 32.33 Downloading opentelemetry_api-1.29.0-py3-none-any.whl (64 kB)
+#9 32.33 Downloading opentelemetry_exporter_otlp_proto_grpc-1.29.0-py3-none-any.whl (18 kB)
+#9 32.34 Downloading opentelemetry_exporter_otlp_proto_common-1.29.0-py3-none-any.whl (18 kB)
+#9 32.35 Downloading opentelemetry_proto-1.29.0-py3-none-any.whl (55 kB)
+#9 32.36 Downloading opentelemetry_instrumentation_fastapi-0.50b0-py3-none-any.whl (12 kB)
+#9 32.37 Downloading opentelemetry_instrumentation-0.50b0-py3-none-any.whl (30 kB)
+#9 32.38 Downloading opentelemetry_instrumentation_asgi-0.50b0-py3-none-any.whl (16 kB)
+#9 32.38 Downloading opentelemetry_semantic_conventions-0.50b0-py3-none-any.whl (166 kB)
+#9 32.39 Downloading opentelemetry_util_http-0.50b0-py3-none-any.whl (6.9 kB)
+#9 32.40 Downloading opentelemetry_sdk-1.29.0-py3-none-any.whl (118 kB)
+#9 32.41 Downloading orjson-3.10.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+#9 32.41 Downloading overrides-7.7.0-py3-none-any.whl (17 kB)
+#9 32.42 Downloading posthog-3.7.5-py2.py3-none-any.whl (54 kB)
+#9 32.43 Downloading protobuf-5.29.2-cp38-abi3-manylinux2014_x86_64.whl (319 kB)
+#9 32.45 Downloading pymongo-4.9.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.9 MB)
+#9 32.46    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 191.6 MB/s eta 0:00:00
+#9 32.48 Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (767 kB)
+#9 32.52    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 767.5/767.5 kB 318.0 MB/s eta 0:00:00
+#9 32.52 Downloading rich-13.9.4-py3-none-any.whl (242 kB)
+#9 32.53 Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#9 32.53 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+#9 32.58    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 265.1 MB/s eta 0:00:00
+#9 32.58 Downloading starlette-0.36.3-py3-none-any.whl (71 kB)
+#9 32.59 Downloading tiktoken-0.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)
+#9 32.61    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 243.8 MB/s eta 0:00:00
+#9 32.61 Downloading tokenizers-0.20.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+#9 32.65    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 162.7 MB/s eta 0:00:00
+#9 32.66 Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+#9 32.67 Downloading typer-0.15.1-py3-none-any.whl (44 kB)
+#9 32.69 Downloading typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+#9 32.70 Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+#9 32.71 Downloading google_api_python_client-2.157.0-py2.py3-none-any.whl (12.8 MB)
+#9 32.77    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.8/12.8 MB 244.8 MB/s eta 0:00:00
+#9 32.78 Downloading importlib_resources-6.5.2-py3-none-any.whl (37 kB)
+#9 32.79 Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl (14 kB)
+#9 32.80 Downloading aiosignal-1.3.2-py2.py3-none-any.whl (7.6 kB)
+#9 32.81 Downloading attrs-24.3.0-py3-none-any.whl (63 kB)
+#9 32.82 Downloading backoff-2.2.1-py3-none-any.whl (15 kB)
+#9 32.83 Downloading cachetools-5.5.0-py3-none-any.whl (9.5 kB)
+#9 32.86 Downloading Deprecated-1.2.15-py2.py3-none-any.whl (9.9 kB)
+#9 32.87 Downloading dnspython-2.7.0-py3-none-any.whl (313 kB)
+#9 32.88 Downloading durationpy-0.9-py3-none-any.whl (3.5 kB)
+#9 32.91 Downloading frozenlist-1.5.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (283 kB)
+#9 32.93 Downloading google_auth_httplib2-0.2.0-py2.py3-none-any.whl (9.3 kB)
+#9 32.95 Downloading googleapis_common_protos-1.66.0-py2.py3-none-any.whl (221 kB)
+#9 32.97 Downloading greenlet-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (613 kB)
+#9 32.98    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 613.1/613.1 kB 176.0 MB/s eta 0:00:00
+#9 32.99 Downloading httplib2-0.22.0-py3-none-any.whl (96 kB)
+#9 33.00 Downloading httptools-0.6.4-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (510 kB)
+#9 33.02 Downloading huggingface_hub-0.27.1-py3-none-any.whl (450 kB)
+#9 33.04 Downloading importlib_metadata-8.5.0-py3-none-any.whl (26 kB)
+#9 33.05 Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+#9 33.07 Downloading markdown_it_py-3.0.0-py3-none-any.whl (87 kB)
+#9 33.07 Downloading monotonic-1.6-py2.py3-none-any.whl (8.2 kB)
+#9 33.09 Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+#9 33.10 Downloading oauthlib-3.2.2-py3-none-any.whl (151 kB)
+#9 33.11 Downloading packaging-24.2-py3-none-any.whl (65 kB)
+#9 33.12 Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (243 kB)
+#9 33.13 Downloading proto_plus-1.25.0-py3-none-any.whl (50 kB)
+#9 33.14 Downloading pyasn1_modules-0.4.1-py3-none-any.whl (181 kB)
+#9 33.14 Downloading pygments-2.19.1-py3-none-any.whl (1.2 MB)
+#9 33.15    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 283.1 MB/s eta 0:00:00
+#9 33.17 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#9 33.18 Downloading regex-2024.11.6-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (796 kB)
+#9 33.19    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 796.9/796.9 kB 276.2 MB/s eta 0:00:00
+#9 33.20 Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+#9 33.20 Downloading rsa-4.9-py3-none-any.whl (34 kB)
+#9 33.21 Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+#9 33.21 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#9 33.22 Downloading uritemplate-4.1.1-py2.py3-none-any.whl (10 kB)
+#9 33.23 Downloading uvloop-0.21.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.7 MB)
+#9 33.30    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 71.1 MB/s eta 0:00:00
+#9 33.31 Downloading watchfiles-1.0.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (442 kB)
+#9 33.32 Downloading websocket_client-1.8.0-py3-none-any.whl (58 kB)
+#9 33.33 Downloading websockets-14.1-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (169 kB)
+#9 33.33 Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (336 kB)
+#9 33.34 Downloading coloredlogs-15.0.1-py2.py3-none-any.whl (46 kB)
+#9 33.35 Downloading flatbuffers-24.12.23-py2.py3-none-any.whl (30 kB)
+#9 33.35 Downloading pyproject_hooks-1.2.0-py3-none-any.whl (10 kB)
+#9 33.36 Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+#9 33.37 Downloading sympy-1.13.3-py3-none-any.whl (6.2 MB)
+#9 33.44    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.2/6.2 MB 116.8 MB/s eta 0:00:00
+#9 33.46 Downloading asgiref-3.8.1-py3-none-any.whl (23 kB)
+#9 33.46 Downloading fsspec-2024.12.0-py3-none-any.whl (183 kB)
+#9 33.48 Downloading grpcio_status-1.69.0-py3-none-any.whl (14 kB)
+#9 33.48 Downloading humanfriendly-10.0-py2.py3-none-any.whl (86 kB)
+#9 33.49 Downloading jsonpointer-3.0.0-py2.py3-none-any.whl (7.6 kB)
+#9 33.50 Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+#9 33.51 Downloading mpmath-1.3.0-py3-none-any.whl (536 kB)
+#9 33.52    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 536.2/536.2 kB 288.1 MB/s eta 0:00:00
+#9 33.53 Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+#9 33.54 Downloading pyparsing-3.2.1-py3-none-any.whl (107 kB)
+#9 33.54 Downloading wrapt-1.17.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (89 kB)
+#9 33.55 Downloading zipp-3.21.0-py3-none-any.whl (9.6 kB)
+#9 33.56 Downloading filelock-3.16.1-py3-none-any.whl (16 kB)
+#9 34.55 Building wheels for collected packages: pypika
+#9 34.55   Building wheel for pypika (pyproject.toml): started
+#9 35.20   Building wheel for pypika (pyproject.toml): finished with status 'done'
+#9 35.23   Created wheel for pypika: filename=PyPika-0.48.9-py2.py3-none-any.whl size=53725 sha256=bc290f866f0210dcea298823088ff1ee3daac72a6cb68034e6b1949da2783f73
+#9 35.23   Stored in directory: /tmp/pip-ephem-wheel-cache-mm1ea5zv/wheels/d5/3d/69/8d68d249cd3de2584f226e27fd431d6344f7d70fd856ebd01b
+#9 35.24 Successfully built pypika
+#9 36.01 Installing collected packages: pypika, mpmath, monotonic, flatbuffers, durationpy, zipp, wrapt, websockets, websocket-client, uvloop, urllib3, uritemplate, typing-extensions, tqdm, tenacity, sympy, sniffio, six, shellingham, regex, PyYAML, python-dotenv, pyproject_hooks, pyparsing, pygments, pyasn1, protobuf, propcache, packaging, overrides, orjson, opentelemetry-util-http, oauthlib, numpy, multidict, mmh3, mdurl, jsonpointer, jiter, importlib-resources, idna, humanfriendly, httptools, h11, grpcio, greenlet, fsspec, frozenlist, filelock, dnspython, distro, click, charset-normalizer, certifi, cachetools, bcrypt, backoff, attrs, asgiref, annotated-types, aiohappyeyeballs, yarl, uvicorn, SQLAlchemy, rsa, requests, python-dateutil, pymongo, pydantic-core, pyasn1-modules, proto-plus, opentelemetry-proto, markdown-it-py, jsonpatch, importlib-metadata, httplib2, httpcore, googleapis-common-protos, deprecated, coloredlogs, chroma-hnswlib, build, anyio, aiosignal, watchfiles, tiktoken, starlette, rich, requests-toolbelt, requests-oauthlib, pydantic, posthog, opentelemetry-exporter-otlp-proto-common, opentelemetry-api, onnxruntime, motor, huggingface-hub, httpx, grpcio-status, google-auth, aiohttp, typer, tokenizers, opentelemetry-semantic-conventions, openai, langsmith, kubernetes, google-auth-httplib2, google-api-core, fastapi, opentelemetry-sdk, opentelemetry-instrumentation, langchain-core, google-api-python-client, opentelemetry-instrumentation-asgi, opentelemetry-exporter-otlp-proto-grpc, langchain-text-splitters, langchain-openai, google-ai-generativelanguage, opentelemetry-instrumentation-fastapi, langchain, google-generativeai, chromadb, langchain-chroma
+#9 87.71 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#9 87.71 Successfully installed PyYAML-6.0.2 SQLAlchemy-2.0.36 aiohappyeyeballs-2.4.4 aiohttp-3.11.11 aiosignal-1.3.2 annotated-types-0.7.0 anyio-4.8.0 asgiref-3.8.1 attrs-24.3.0 backoff-2.2.1 bcrypt-4.2.1 build-1.2.2.post1 cachetools-5.5.0 certifi-2024.12.14 charset-normalizer-3.4.1 chroma-hnswlib-0.7.6 chromadb-0.5.23 click-8.1.8 coloredlogs-15.0.1 deprecated-1.2.15 distro-1.9.0 dnspython-2.7.0 durationpy-0.9 fastapi-0.109.2 filelock-3.16.1 flatbuffers-24.12.23 frozenlist-1.5.0 fsspec-2024.12.0 google-ai-generativelanguage-0.6.10 google-api-core-2.24.0 google-api-python-client-2.157.0 google-auth-2.37.0 google-auth-httplib2-0.2.0 google-generativeai-0.8.3 googleapis-common-protos-1.66.0 greenlet-3.1.1 grpcio-1.69.0 grpcio-status-1.69.0 h11-0.14.0 httpcore-1.0.7 httplib2-0.22.0 httptools-0.6.4 httpx-0.28.1 huggingface-hub-0.27.1 humanfriendly-10.0 idna-3.10 importlib-metadata-8.5.0 importlib-resources-6.5.2 jiter-0.8.2 jsonpatch-1.33 jsonpointer-3.0.0 kubernetes-31.0.0 langchain-0.3.14 langchain-chroma-0.1.4 langchain-core-0.3.29 langchain-openai-0.2.14 langchain-text-splitters-0.3.4 langsmith-0.2.10 markdown-it-py-3.0.0 mdurl-0.1.2 mmh3-5.0.1 monotonic-1.6 motor-3.6.0 mpmath-1.3.0 multidict-6.1.0 numpy-1.26.4 oauthlib-3.2.2 onnxruntime-1.20.1 openai-1.59.3 opentelemetry-api-1.29.0 opentelemetry-exporter-otlp-proto-common-1.29.0 opentelemetry-exporter-otlp-proto-grpc-1.29.0 opentelemetry-instrumentation-0.50b0 opentelemetry-instrumentation-asgi-0.50b0 opentelemetry-instrumentation-fastapi-0.50b0 opentelemetry-proto-1.29.0 opentelemetry-sdk-1.29.0 opentelemetry-semantic-conventions-0.50b0 opentelemetry-util-http-0.50b0 orjson-3.10.13 overrides-7.7.0 packaging-24.2 posthog-3.7.5 propcache-0.2.1 proto-plus-1.25.0 protobuf-5.29.2 pyasn1-0.6.1 pyasn1-modules-0.4.1 pydantic-2.10.4 pydantic-core-2.27.2 pygments-2.19.1 pymongo-4.9.2 pyparsing-3.2.1 pypika-0.48.9 pyproject_hooks-1.2.0 python-dateutil-2.9.0.post0 python-dotenv-1.0.1 regex-2024.11.6 requests-2.32.3 requests-oauthlib-2.0.0 requests-toolbelt-1.0.0 rich-13.9.4 rsa-4.9 shellingham-1.5.4 six-1.17.0 sniffio-1.3.1 starlette-0.36.3 sympy-1.13.3 tenacity-9.0.0 tiktoken-0.8.0 tokenizers-0.20.3 tqdm-4.67.1 typer-0.15.1 typing-extensions-4.12.2 uritemplate-4.1.1 urllib3-2.3.0 uvicorn-0.34.0 uvloop-0.21.0 watchfiles-1.0.3 websocket-client-1.8.0 websockets-14.1 wrapt-1.17.0 yarl-1.18.3 zipp-3.21.0
+#9 DONE 91.2s
+
+#10 [ragchain_service 5/6] RUN pip install --no-cache-dir --upgrade pip
+#10 1.089 Requirement already satisfied: pip in /usr/local/lib/python3.12/site-packages (24.3.1)
+#10 1.648 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#10 DONE 2.1s
+
+#11 [ragchain_service 6/6] COPY . /app
+#11 DONE 0.0s
+
+#12 [ragchain_service] exporting to image
+#12 exporting layers
+#12 exporting layers 6.4s done
+#12 writing image sha256:fe8e75d1c0b7dcffca52d401e37e1adfb88ac7ad36b45fe123de4706b2730208 done
+#12 naming to docker.io/library/qmcs-ragchain_service done
+#12 DONE 6.4s
+
+#13 [ragchain_service] resolving provenance for metadata file
+ Service ragchain_service  Built
+#13 DONE 0.0s
+
+[STEP 4] Restart ragchain_service container
+ Container ragchain_service  Recreate
+ Container ragchain_service  Recreated
+ Container ragchain_service  Starting
+ Container ragchain_service  Started
+
+[STEP 5] Tail logs for ragchain_service (Ctrl+C to stop)...
+========================================================
+ragchain_service  | Traceback (most recent call last):
+ragchain_service  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+ragchain_service  |     sys.exit(main())
+ragchain_service  |              ^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1133, in get_code
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1063, in source_to_code
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 86
+ragchain_service  |     req.chunk_size=req.chunk_size,
+ragchain_service  |     ^^^^^^^^^^^^^^^
+ragchain_service  | SyntaxError: expression cannot contain assignment, perhaps you meant "=="?
+[Kragchain_service exited with code 0
+ragchain_service  | Traceback (most recent call last):
+ragchain_service  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+ragchain_service  |     sys.exit(main())
+ragchain_service  |              ^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1133, in get_code
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1063, in source_to_code
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 86
+ragchain_service  |     req.chunk_size=req.chunk_size,
+ragchain_service  |     ^^^^^^^^^^^^^^^
+ragchain_service  | SyntaxError: expression cannot contain assignment, perhaps you meant "=="?
+[Kragchain_service exited with code 0
+ragchain_service  | Traceback (most recent call last):
+ragchain_service  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+ragchain_service  |     sys.exit(main())
+ragchain_service  |              ^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1133, in get_code
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1063, in source_to_code
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 86
+ragchain_service  |     req.chunk_size=req.chunk_size,
+ragchain_service  |     ^^^^^^^^^^^^^^^
+ragchain_service  | SyntaxError: expression cannot contain assignment, perhaps you meant "=="?
+[Kragchain_service exited with code 1
+ragchain_service  | Traceback (most recent call last):
+ragchain_service  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+ragchain_service  |     sys.exit(main())
+ragchain_service  |              ^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1133, in get_code
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1063, in source_to_code
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 86
+ragchain_service  |     req.chunk_size=req.chunk_size,
+ragchain_service  |     ^^^^^^^^^^^^^^^
+ragchain_service  | SyntaxError: expression cannot contain assignment, perhaps you meant "=="?
+[Kragchain_service exited with code 1
+ragchain_service  | Traceback (most recent call last):
+ragchain_service  |   File "/usr/local/bin/uvicorn", line 8, in <module>
+ragchain_service  |     sys.exit(main())
+ragchain_service  |              ^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1133, in get_code
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 1063, in source_to_code
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 86
+ragchain_service  |     req.chunk_size=req.chunk_size,
+ragchain_service  |     ^^^^^^^^^^^^^^^
+ragchain_service  | SyntaxError: expression cannot contain assignment, perhaps you meant "=="?
+[Kragchain_service exited with code 1

@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+import os
+import logging
+import google.genai as genai
+from google.genai import types
+from google.genai.errors import ClientError
+
+logging.basicConfig(level=logging.INFO)
+
+def main():
+    # Pull API key from environment
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if not api_key:
+        logging.error("No GEMINI_API_KEY set. Please export your API key.")
+        return
+
+    genai.configure(api_key=api_key)
+
+    # Attempt a request
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-pro",  # example model
+            contents="Hello from advanced demo!",
+            config=types.GenerateContentConfig(temperature=0.2),
+        )
+        logging.info(f"LLM Response: {response.text}")
+    except ClientError as ce:
+        logging.error(f"ClientError: {ce}")
+    except Exception as ex:
+        logging.error(f"Unexpected Error: {ex}")
+
+if __name__ == "__main__":
+    main()

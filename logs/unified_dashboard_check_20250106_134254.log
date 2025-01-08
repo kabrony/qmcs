@@ -1,0 +1,32 @@
+[INFO] 2025-01-06 13:42:54 - Starting Check #1: API Key Validity...
+[ERROR] 2025-01-06 13:42:54 - API Key validity check failed. Full response: {
+  "error": {
+    "message": "Incorrect API key provided: sk-svcac******************************************************************************************************************************2mQA. You can find your API key at https://platform.openai.com/account/api-keys.",
+    "type": "invalid_request_error",
+    "param": null,
+    "code": "invalid_api_key"
+  }
+}
+[INFO] 2025-01-06 13:42:54 - Starting Check #2: Model Availability...
+[ERROR] 2025-01-06 13:42:54 - Model availability check failed.
+[INFO] 2025-01-06 13:42:54 - Starting Check #3: Rate Limit (Illustrative)
+[INFO] 2025-01-06 13:42:54 - Rate limit check is purely illustrative.
+[INFO] 2025-01-06 13:42:54 - Starting Check #4: Basic Text Completion...
+[ERROR] 2025-01-06 13:42:54 - Text completion check failed. Response: {
+    "error": {
+        "message": "Incorrect API key provided: sk-svcac******************************************************************************************************************************2mQA. You can find your API key at https://platform.openai.com/account/api-keys.",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "invalid_api_key"
+    }
+}
+[INFO] 2025-01-06 13:42:54 - Starting Check #5: Basic Chat Completion...
+[ERROR] 2025-01-06 13:42:55 - Chat completion check failed. Response: {
+    "error": {
+        "message": "Incorrect API key provided: sk-svcac******************************************************************************************************************************2mQA. You can find your API key at https://platform.openai.com/account/api-keys.",
+        "type": "invalid_request_error",
+        "param": null,
+        "code": "invalid_api_key"
+    }
+}
+[INFO] 2025-01-06 13:42:55 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'logs/unified_dashboard_check_20250106_134254.log'.

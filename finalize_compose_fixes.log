@@ -1,0 +1,444 @@
+[INFO] Starting finalize_compose_fixes.sh...
+[STEP 1] Removing 'version' line from docker-compose.yml...
+[INFO] Removed 'version:' line. Backup: docker-compose.yml.bak
+[STEP 2] Docker compose build & up
+ Network solais-network  Removing
+ Network solais-network  Removed
+ Service quant-service  Building
+ Service solana_agents  Building
+ Service ragchain-service  Building
+#0 building with "default" instance using docker driver
+
+#1 [quant-service internal] load build definition from Dockerfile
+#1 transferring dockerfile: 232B done
+#1 DONE 0.0s
+
+#2 [ragchain-service internal] load build definition from Dockerfile
+#2 transferring dockerfile: 419B 0.0s done
+#2 DONE 0.0s
+
+#3 [solana_agents internal] load build definition from Dockerfile
+#3 transferring dockerfile: 330B done
+#3 DONE 0.0s
+
+#4 [solana_agents internal] load metadata for docker.io/library/node:18-slim
+#4 ...
+
+#5 [quant-service internal] load metadata for docker.io/library/python:3.10-slim
+#5 DONE 0.3s
+
+#6 [quant-service internal] load .dockerignore
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [quant-service 1/5] FROM docker.io/library/python:3.10-slim@sha256:bdc6c5b8f725df8b009b32da65cbf46bfd24d1c86dce2e6169452c193ad660b4
+#7 DONE 0.0s
+
+#8 [ragchain-service internal] load metadata for docker.io/library/python:3.12-slim
+#8 DONE 0.3s
+
+#9 [quant-service 2/5] WORKDIR /app
+#9 CACHED
+
+#10 [quant-service internal] load build context
+#10 transferring context: 312B done
+#10 DONE 0.0s
+
+#11 [ragchain-service internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.0s
+
+#4 [solana_agents internal] load metadata for docker.io/library/node:18-slim
+#4 DONE 0.3s
+
+#12 [ragchain-service 1/6] FROM docker.io/library/python:3.12-slim@sha256:10f3aaab98db50cba827d3b33a91f39dc9ec2d02ca9b85cbc5008220d07b17f3
+#12 DONE 0.0s
+
+#13 [ragchain-service 2/6] WORKDIR /app
+#13 CACHED
+
+#14 [solana_agents internal] load .dockerignore
+#14 transferring context: 2B done
+#14 DONE 0.0s
+
+#15 [solana_agents 1/4] FROM docker.io/library/node:18-slim@sha256:140acd7048aedfc27a54b40c516df9bfb72f0685b51f6f54499c0daeb7f4b93c
+#15 DONE 0.0s
+
+#16 [ragchain-service internal] load build context
+#16 transferring context: 537B done
+#16 DONE 0.0s
+
+#17 [solana_agents 2/4] WORKDIR /app
+#17 CACHED
+
+#18 [quant-service 3/5] COPY requirements.txt /app/
+#18 DONE 0.0s
+
+#19 [solana_agents internal] load build context
+#19 transferring context: 577B 0.0s done
+#19 DONE 0.0s
+
+#20 [ragchain-service 3/6] COPY requirements.txt /app/
+#20 DONE 0.0s
+
+#21 [solana_agents 3/4] COPY . /app
+#21 DONE 0.1s
+
+#22 [solana_agents 4/4] RUN npm install     express     node-cron     dotenv     axios     @solana/web3.js
+#22 ...
+
+#23 [quant-service 4/5] RUN pip install --no-cache-dir -r requirements.txt
+#23 3.375 Collecting openai>=1.0.0
+#23 3.462   Downloading openai-1.59.4-py3-none-any.whl (454 kB)
+#23 3.518      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 454.8/454.8 kB 9.3 MB/s eta 0:00:00
+#23 3.572 Collecting python-dotenv>=1.0.0
+#23 3.576   Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+#23 3.734 Collecting fastapi
+#23 3.746   Downloading fastapi-0.115.6-py3-none-any.whl (94 kB)
+#23 3.750      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 94.8/94.8 kB 224.8 MB/s eta 0:00:00
+#23 3.844 Collecting uvicorn
+#23 3.875   Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#23 3.879      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.3/62.3 kB 130.2 MB/s eta 0:00:00
+#23 3.964 Collecting requests
+#23 3.969   Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+#23 3.975      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 64.9/64.9 kB 173.4 MB/s eta 0:00:00
+#23 4.411 Collecting pydantic
+#23 4.411   Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#23 4.415      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 431.8/431.8 kB 144.2 MB/s eta 0:00:00
+#23 4.475 Collecting httpx
+#23 4.482   Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#23 4.487      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 173.8 MB/s eta 0:00:00
+#23 4.541 Collecting distro<2,>=1.7.0
+#23 4.548   Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+#23 4.608 Collecting typing-extensions<5,>=4.11
+#23 4.614   Downloading typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+#23 4.643 Collecting sniffio
+#23 4.649   Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#23 4.818 Collecting tqdm>4
+#23 4.824   Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+#23 4.829      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.5/78.5 kB 208.2 MB/s eta 0:00:00
+#23 5.025 Collecting jiter<1,>=0.4.0
+#23 5.030   Downloading jiter-0.8.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (345 kB)
+#23 5.038      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 345.0/345.0 kB 212.7 MB/s eta 0:00:00
+#23 5.096 Collecting anyio<5,>=3.5.0
+#23 5.102   Downloading anyio-4.8.0-py3-none-any.whl (96 kB)
+#23 5.109      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 96.0/96.0 kB 107.8 MB/s eta 0:00:00
+#23 5.389 Collecting starlette<0.42.0,>=0.40.0
+#23 5.392   Downloading starlette-0.41.3-py3-none-any.whl (73 kB)
+#23 5.396      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.2/73.2 kB 233.6 MB/s eta 0:00:00
+#23 5.449 Collecting h11>=0.8
+#23 5.458   Downloading h11-0.14.0-py3-none-any.whl (58 kB)
+#23 5.464      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 58.3/58.3 kB 133.2 MB/s eta 0:00:00
+#23 5.531 Collecting click>=7.0
+#23 5.535   Downloading click-8.1.8-py3-none-any.whl (98 kB)
+#23 5.540      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 98.2/98.2 kB 149.3 MB/s eta 0:00:00
+#23 5.610 Collecting certifi>=2017.4.17
+#23 5.619   Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+#23 5.620      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 164.9/164.9 kB 224.3 MB/s eta 0:00:00
+#23 5.656 Collecting idna<4,>=2.5
+#23 5.662   Downloading idna-3.10-py3-none-any.whl (70 kB)
+#23 5.667      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 70.4/70.4 kB 147.6 MB/s eta 0:00:00
+#23 5.972 Collecting charset-normalizer<4,>=2
+#23 5.972   Downloading charset_normalizer-3.4.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (146 kB)
+#23 5.980      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 146.1/146.1 kB 213.5 MB/s eta 0:00:00
+#23 6.084 Collecting urllib3<3,>=1.21.1
+#23 6.088   Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+#23 6.093      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.4/128.4 kB 194.9 MB/s eta 0:00:00
+#23 6.126 Collecting annotated-types>=0.6.0
+#23 6.132   Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+#23 8.593 Collecting pydantic-core==2.27.2
+#23 8.600   Downloading pydantic_core-2.27.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+#23 8.628      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 88.7 MB/s eta 0:00:00
+#23 8.766 Collecting httpcore==1.*
+#23 8.768   Downloading httpcore-1.0.7-py3-none-any.whl (78 kB)
+#23 8.773      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.6/78.6 kB 169.3 MB/s eta 0:00:00
+#23 8.882 Collecting exceptiongroup>=1.0.2
+#23 8.886   Downloading exceptiongroup-1.2.2-py3-none-any.whl (16 kB)
+#23 9.393 Installing collected packages: urllib3, typing-extensions, tqdm, sniffio, python-dotenv, jiter, idna, h11, exceptiongroup, distro, click, charset-normalizer, certifi, annotated-types, uvicorn, requests, pydantic-core, httpcore, anyio, starlette, pydantic, httpx, openai, fastapi
+#23 ...
+
+#24 [ragchain-service 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#24 3.282 Collecting langchain-community (from -r requirements.txt (line 1))
+#24 3.372   Downloading langchain_community-0.3.14-py3-none-any.whl.metadata (2.9 kB)
+#24 3.450 Collecting uvicorn (from -r requirements.txt (line 3))
+#24 3.456   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+#24 3.565 Collecting PyYAML>=5.3 (from langchain-community->-r requirements.txt (line 1))
+#24 3.572   Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+#24 4.428 Collecting SQLAlchemy<3,>=1.4 (from langchain-community->-r requirements.txt (line 1))
+#24 4.434   Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.7 kB)
+#24 5.343 Collecting aiohttp<4.0.0,>=3.8.3 (from langchain-community->-r requirements.txt (line 1))
+#24 5.349   Downloading aiohttp-3.11.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+#24 5.420 Collecting dataclasses-json<0.7,>=0.5.7 (from langchain-community->-r requirements.txt (line 1))
+#24 5.426   Downloading dataclasses_json-0.6.7-py3-none-any.whl.metadata (25 kB)
+#24 5.458 Collecting httpx-sse<0.5.0,>=0.4.0 (from langchain-community->-r requirements.txt (line 1))
+#24 5.465   Downloading httpx_sse-0.4.0-py3-none-any.whl.metadata (9.0 kB)
+#24 5.761 Collecting langchain<0.4.0,>=0.3.14 (from langchain-community->-r requirements.txt (line 1))
+#24 5.769   Downloading langchain-0.3.14-py3-none-any.whl.metadata (7.1 kB)
+#24 5.936 Collecting langchain-core<0.4.0,>=0.3.29 (from langchain-community->-r requirements.txt (line 1))
+#24 5.948   Downloading langchain_core-0.3.29-py3-none-any.whl.metadata (6.3 kB)
+#24 6.176 Collecting langsmith<0.3,>=0.1.125 (from langchain-community->-r requirements.txt (line 1))
+#24 6.181   Downloading langsmith-0.2.10-py3-none-any.whl.metadata (14 kB)
+#24 6.658 Collecting numpy<3,>=1.26.2 (from langchain-community->-r requirements.txt (line 1))
+#24 6.665   Downloading numpy-2.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+#24 6.735 Collecting pydantic-settings<3.0.0,>=2.4.0 (from langchain-community->-r requirements.txt (line 1))
+#24 6.742   Downloading pydantic_settings-2.7.1-py3-none-any.whl.metadata (3.5 kB)
+#24 6.843 Collecting requests<3,>=2 (from langchain-community->-r requirements.txt (line 1))
+#24 6.855   Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+#24 6.903 Collecting tenacity!=8.4.0,<10,>=8.1.0 (from langchain-community->-r requirements.txt (line 1))
+#24 6.910   Downloading tenacity-9.0.0-py3-none-any.whl.metadata (1.2 kB)
+#24 6.950 Collecting click>=7.0 (from uvicorn->-r requirements.txt (line 3))
+#24 6.956   Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)
+#24 6.978 Collecting h11>=0.8 (from uvicorn->-r requirements.txt (line 3))
+#24 6.983   Downloading h11-0.14.0-py3-none-any.whl.metadata (8.2 kB)
+#24 7.032 Collecting aiohappyeyeballs>=2.3.0 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.037   Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl.metadata (6.1 kB)
+#24 7.063 Collecting aiosignal>=1.1.2 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.069   Downloading aiosignal-1.3.2-py2.py3-none-any.whl.metadata (3.8 kB)
+#24 7.104 Collecting attrs>=17.3.0 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.109   Downloading attrs-24.3.0-py3-none-any.whl.metadata (11 kB)
+#24 7.220 Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.229   Downloading frozenlist-1.5.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (13 kB)
+#24 7.590 Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.594   Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.0 kB)
+#24 7.671 Collecting propcache>=0.2.0 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 7.676   Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.2 kB)
+#24 8.298 Collecting yarl<2.0,>=1.17.0 (from aiohttp<4.0.0,>=3.8.3->langchain-community->-r requirements.txt (line 1))
+#24 8.303   Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (69 kB)
+#24 8.493 Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community->-r requirements.txt (line 1))
+#24 8.512   Downloading marshmallow-3.24.1-py3-none-any.whl.metadata (7.1 kB)
+#24 8.535 Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community->-r requirements.txt (line 1))
+#24 8.543   Downloading typing_inspect-0.9.0-py3-none-any.whl.metadata (1.5 kB)
+#24 8.581 Collecting langchain-text-splitters<0.4.0,>=0.3.3 (from langchain<0.4.0,>=0.3.14->langchain-community->-r requirements.txt (line 1))
+#24 8.587   Downloading langchain_text_splitters-0.3.5-py3-none-any.whl.metadata (2.3 kB)
+#24 8.928 Collecting pydantic<3.0.0,>=2.7.4 (from langchain<0.4.0,>=0.3.14->langchain-community->-r requirements.txt (line 1))
+#24 8.948   Downloading pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+#24 8.997 Collecting jsonpatch<2.0,>=1.33 (from langchain-core<0.4.0,>=0.3.29->langchain-community->-r requirements.txt (line 1))
+#24 9.002   Downloading jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+#24 9.048 Collecting packaging<25,>=23.2 (from langchain-core<0.4.0,>=0.3.29->langchain-community->-r requirements.txt (line 1))
+#24 9.055   Downloading packaging-24.2-py3-none-any.whl.metadata (3.2 kB)
+#24 9.097 Collecting typing-extensions>=4.7 (from langchain-core<0.4.0,>=0.3.29->langchain-community->-r requirements.txt (line 1))
+#24 9.109   Downloading typing_extensions-4.12.2-py3-none-any.whl.metadata (3.0 kB)
+#24 9.180 Collecting httpx<1,>=0.23.0 (from langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 9.189   Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+#24 9.789 Collecting orjson<4.0.0,>=3.9.14 (from langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 9.796   Downloading orjson-3.10.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (41 kB)
+#24 9.831 Collecting requests-toolbelt<2.0.0,>=1.0.0 (from langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 9.837   Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+#24 9.901 Collecting python-dotenv>=0.21.0 (from pydantic-settings<3.0.0,>=2.4.0->langchain-community->-r requirements.txt (line 1))
+#24 9.909   Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+#24 10.11 Collecting charset-normalizer<4,>=2 (from requests<3,>=2->langchain-community->-r requirements.txt (line 1))
+#24 10.11   Downloading charset_normalizer-3.4.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (35 kB)
+#24 10.14 Collecting idna<4,>=2.5 (from requests<3,>=2->langchain-community->-r requirements.txt (line 1))
+#24 10.14   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+#24 10.24 Collecting urllib3<3,>=1.21.1 (from requests<3,>=2->langchain-community->-r requirements.txt (line 1))
+#24 10.25   Downloading urllib3-2.3.0-py3-none-any.whl.metadata (6.5 kB)
+#24 10.30 Collecting certifi>=2017.4.17 (from requests<3,>=2->langchain-community->-r requirements.txt (line 1))
+#24 10.31   Downloading certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+#24 10.61 Collecting greenlet!=0.4.17 (from SQLAlchemy<3,>=1.4->langchain-community->-r requirements.txt (line 1))
+#24 10.61   Downloading greenlet-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.8 kB)
+#24 10.70 Collecting anyio (from httpx<1,>=0.23.0->langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 10.70   Downloading anyio-4.8.0-py3-none-any.whl.metadata (4.6 kB)
+#24 10.76 Collecting httpcore==1.* (from httpx<1,>=0.23.0->langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 10.76   Downloading httpcore-1.0.7-py3-none-any.whl.metadata (21 kB)
+#24 10.80 Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.33->langchain-core<0.4.0,>=0.3.29->langchain-community->-r requirements.txt (line 1))
+#24 10.81   Downloading jsonpointer-3.0.0-py2.py3-none-any.whl.metadata (2.3 kB)
+#24 10.86 Collecting annotated-types>=0.6.0 (from pydantic<3.0.0,>=2.7.4->langchain<0.4.0,>=0.3.14->langchain-community->-r requirements.txt (line 1))
+#24 10.87   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+#24 ...
+
+#22 [solana_agents 4/4] RUN npm install     express     node-cron     dotenv     axios     @solana/web3.js
+#22 11.85 
+#22 11.85 added 135 packages, and audited 136 packages in 11s
+#22 11.85 
+#22 11.85 26 packages are looking for funding
+#22 11.85   run `npm fund` for details
+#22 11.85 
+#22 11.85 found 0 vulnerabilities
+#22 11.85 npm notice
+#22 11.85 npm notice New major version of npm available! 10.8.2 -> 11.0.0
+#22 11.85 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.0.0
+#22 11.85 npm notice To update run: npm install -g npm@11.0.0
+#22 11.85 npm notice
+#22 DONE 12.1s
+
+#24 [ragchain-service 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#24 ...
+
+#25 [solana_agents] exporting to image
+#25 exporting layers
+#25 ...
+
+#23 [quant-service 4/5] RUN pip install --no-cache-dir -r requirements.txt
+#23 12.41 Successfully installed annotated-types-0.7.0 anyio-4.8.0 certifi-2024.12.14 charset-normalizer-3.4.1 click-8.1.8 distro-1.9.0 exceptiongroup-1.2.2 fastapi-0.115.6 h11-0.14.0 httpcore-1.0.7 httpx-0.28.1 idna-3.10 jiter-0.8.2 openai-1.59.4 pydantic-2.10.4 pydantic-core-2.27.2 python-dotenv-1.0.1 requests-2.32.3 sniffio-1.3.1 starlette-0.41.3 tqdm-4.67.1 typing-extensions-4.12.2 urllib3-2.3.0 uvicorn-0.34.0
+#23 12.41 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#23 12.62 
+#23 12.62 [notice] A new release of pip is available: 23.0.1 -> 24.3.1
+#23 12.62 [notice] To update, run: pip install --upgrade pip
+#23 DONE 13.3s
+
+#26 [quant-service 5/5] COPY . /app
+#26 DONE 0.1s
+
+#24 [ragchain-service 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#24 12.58 Collecting pydantic-core==2.27.2 (from pydantic<3.0.0,>=2.7.4->langchain<0.4.0,>=0.3.14->langchain-community->-r requirements.txt (line 1))
+#24 12.58   Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#24 12.72 Collecting mypy-extensions>=0.3.0 (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7,>=0.5.7->langchain-community->-r requirements.txt (line 1))
+#24 12.74   Downloading mypy_extensions-1.0.0-py3-none-any.whl.metadata (1.1 kB)
+#24 12.87 Collecting sniffio>=1.1 (from anyio->httpx<1,>=0.23.0->langsmith<0.3,>=0.1.125->langchain-community->-r requirements.txt (line 1))
+#24 12.87   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#24 12.90 Downloading langchain_community-0.3.14-py3-none-any.whl (2.5 MB)
+#24 12.93    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.5/2.5 MB 165.0 MB/s eta 0:00:00
+#24 12.93 Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+#24 12.95 Downloading aiohttp-3.11.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+#24 12.97    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 234.8 MB/s eta 0:00:00
+#24 12.97 Downloading click-8.1.8-py3-none-any.whl (98 kB)
+#24 12.98 Downloading dataclasses_json-0.6.7-py3-none-any.whl (28 kB)
+#24 12.98 Downloading h11-0.14.0-py3-none-any.whl (58 kB)
+#24 12.99 Downloading httpx_sse-0.4.0-py3-none-any.whl (7.8 kB)
+#24 13.01 Downloading langchain-0.3.14-py3-none-any.whl (1.0 MB)
+#24 13.02    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.0/1.0 MB 256.8 MB/s eta 0:00:00
+#24 13.03 Downloading langchain_core-0.3.29-py3-none-any.whl (411 kB)
+#24 13.04 Downloading langsmith-0.2.10-py3-none-any.whl (326 kB)
+#24 13.05 Downloading numpy-2.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.1 MB)
+#24 13.12    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.1/16.1 MB 252.5 MB/s eta 0:00:00
+#24 13.13 Downloading pydantic_settings-2.7.1-py3-none-any.whl (29 kB)
+#24 13.14 Downloading PyYAML-6.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (767 kB)
+#24 13.15    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 767.5/767.5 kB 416.3 MB/s eta 0:00:00
+#24 13.16 Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+#24 13.17 Downloading SQLAlchemy-2.0.36-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+#24 13.20    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 388.7 MB/s eta 0:00:00
+#24 13.20 Downloading tenacity-9.0.0-py3-none-any.whl (28 kB)
+#24 13.21 Downloading aiohappyeyeballs-2.4.4-py3-none-any.whl (14 kB)
+#24 13.21 Downloading aiosignal-1.3.2-py2.py3-none-any.whl (7.6 kB)
+#24 13.23 Downloading attrs-24.3.0-py3-none-any.whl (63 kB)
+#24 13.25 Downloading certifi-2024.12.14-py3-none-any.whl (164 kB)
+#24 13.27 Downloading charset_normalizer-3.4.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (145 kB)
+#24 13.29 Downloading frozenlist-1.5.0-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (283 kB)
+#24 13.29 Downloading greenlet-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (613 kB)
+#24 13.30    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 613.1/613.1 kB 214.6 MB/s eta 0:00:00
+#24 13.31 Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+#24 13.31 Downloading httpcore-1.0.7-py3-none-any.whl (78 kB)
+#24 13.32 Downloading idna-3.10-py3-none-any.whl (70 kB)
+#24 13.33 Downloading jsonpatch-1.33-py2.py3-none-any.whl (12 kB)
+#24 13.34 Downloading langchain_text_splitters-0.3.5-py3-none-any.whl (31 kB)
+#24 13.34 Downloading marshmallow-3.24.1-py3-none-any.whl (49 kB)
+#24 13.35 Downloading multidict-6.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+#24 13.36 Downloading orjson-3.10.13-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (131 kB)
+#24 13.36 Downloading packaging-24.2-py3-none-any.whl (65 kB)
+#24 13.37 Downloading propcache-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (243 kB)
+#24 13.38 Downloading pydantic-2.10.4-py3-none-any.whl (431 kB)
+#24 13.40 Downloading pydantic_core-2.27.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+#24 13.41    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 290.5 MB/s eta 0:00:00
+#24 13.42 Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+#24 13.43 Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+#24 13.44 Downloading typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+#24 13.45 Downloading typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)
+#24 13.45 Downloading urllib3-2.3.0-py3-none-any.whl (128 kB)
+#24 13.45 Downloading yarl-1.18.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (336 kB)
+#24 13.48 Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+#24 13.48 Downloading jsonpointer-3.0.0-py2.py3-none-any.whl (7.6 kB)
+#24 13.48 Downloading mypy_extensions-1.0.0-py3-none-any.whl (4.7 kB)
+#24 13.48 Downloading anyio-4.8.0-py3-none-any.whl (96 kB)
+#24 13.50 Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#24 ...
+
+#25 [solana_agents] exporting to image
+#25 exporting layers 1.5s done
+#25 writing image sha256:d2f747af4bdb48290c1134ead8f76e9e9eb39eded695d4166210116a8b648358 0.0s done
+#25 naming to docker.io/library/qmcs-solana_agents 0.0s done
+#25 DONE 1.6s
+ Service solana_agents  Built
+
+#27 [solana_agents] resolving provenance for metadata file
+#27 DONE 0.0s
+
+#28 [quant-service] exporting to image
+#28 exporting layers 0.8s done
+#28 writing image sha256:1ec9e7495d79dbb2ede47c79555dd7765e5c383f0ace2a6afe2708b6645e6fd4 done
+#28 naming to docker.io/library/qmcs-quant-service 0.0s done
+#28 DONE 0.9s
+
+#29 [quant-service] resolving provenance for metadata file
+ Service quant-service  Built
+#29 DONE 0.0s
+
+#24 [ragchain-service 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#24 14.11 Installing collected packages: urllib3, typing-extensions, tenacity, sniffio, PyYAML, python-dotenv, propcache, packaging, orjson, numpy, mypy-extensions, multidict, jsonpointer, idna, httpx-sse, h11, greenlet, frozenlist, click, charset-normalizer, certifi, attrs, annotated-types, aiohappyeyeballs, yarl, uvicorn, typing-inspect, SQLAlchemy, requests, pydantic-core, marshmallow, jsonpatch, httpcore, anyio, aiosignal, requests-toolbelt, pydantic, httpx, dataclasses-json, aiohttp, pydantic-settings, langsmith, langchain-core, langchain-text-splitters, langchain, langchain-community
+#24 30.57 Successfully installed PyYAML-6.0.2 SQLAlchemy-2.0.36 aiohappyeyeballs-2.4.4 aiohttp-3.11.11 aiosignal-1.3.2 annotated-types-0.7.0 anyio-4.8.0 attrs-24.3.0 certifi-2024.12.14 charset-normalizer-3.4.1 click-8.1.8 dataclasses-json-0.6.7 frozenlist-1.5.0 greenlet-3.1.1 h11-0.14.0 httpcore-1.0.7 httpx-0.28.1 httpx-sse-0.4.0 idna-3.10 jsonpatch-1.33 jsonpointer-3.0.0 langchain-0.3.14 langchain-community-0.3.14 langchain-core-0.3.29 langchain-text-splitters-0.3.5 langsmith-0.2.10 marshmallow-3.24.1 multidict-6.1.0 mypy-extensions-1.0.0 numpy-2.2.1 orjson-3.10.13 packaging-24.2 propcache-0.2.1 pydantic-2.10.4 pydantic-core-2.27.2 pydantic-settings-2.7.1 python-dotenv-1.0.1 requests-2.32.3 requests-toolbelt-1.0.0 sniffio-1.3.1 tenacity-9.0.0 typing-extensions-4.12.2 typing-inspect-0.9.0 urllib3-2.3.0 uvicorn-0.34.0 yarl-1.18.3
+#24 30.57 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#24 DONE 32.5s
+
+#30 [ragchain-service 5/6] RUN pip install --no-cache-dir --upgrade pip
+#30 0.971 Requirement already satisfied: pip in /usr/local/lib/python3.12/site-packages (24.3.1)
+#30 1.232 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#30 DONE 1.6s
+
+#31 [ragchain-service 6/6] COPY . /app
+#31 DONE 0.1s
+
+#32 [ragchain-service] exporting to image
+#32 exporting layers
+#32 exporting layers 2.4s done
+#32 writing image sha256:79b7e17753e9f5c6229062896e53e594bee32bf532ed29bc2d9acb763c596992 done
+#32 naming to docker.io/library/qmcs-ragchain-service done
+#32 DONE 2.4s
+
+#33 [ragchain-service] resolving provenance for metadata file
+ Service ragchain-service  Built
+#33 DONE 0.0s
+ Network solais-network  Creating
+ Network solais-network  Created
+ Container solana_agents  Creating
+ Container local_mongo  Creating
+ Container quant_service  Creating
+ Container solana_agents  Created
+ Container quant_service  Created
+ Container local_mongo  Created
+ Container ragchain_service  Creating
+ Container ragchain_service  Created
+ Container local_mongo  Starting
+ Container quant_service  Starting
+ Container solana_agents  Starting
+ Container local_mongo  Started
+ Container ragchain_service  Starting
+ Container quant_service  Started
+ Container solana_agents  Started
+ Container ragchain_service  Started
+[INFO] Compose up completed. Checking short logs...
+[STEP 3] Short tail logs (20 lines each container)
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.635+00:00"},"s":"I",  "c":"CONTROL",  "id":23285,   "ctx":"main","msg":"Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'"}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.635+00:00"},"s":"I",  "c":"CONTROL",  "id":5945603, "ctx":"main","msg":"Multi threading initialized"}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.636+00:00"},"s":"I",  "c":"NETWORK",  "id":4648601, "ctx":"main","msg":"Implicit TCP FastOpen unavailable. If TCP FastOpen is required, set at least one of the related parameters","attr":{"relatedParameters":["tcpFastOpenServer","tcpFastOpenClient","tcpFastOpenQueueSize"]}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.638+00:00"},"s":"I",  "c":"NETWORK",  "id":4915701, "ctx":"main","msg":"Initialized wire specification","attr":{"spec":{"incomingExternalClient":{"minWireVersion":0,"maxWireVersion":25},"incomingInternalClient":{"minWireVersion":0,"maxWireVersion":25},"outgoing":{"minWireVersion":6,"maxWireVersion":25},"isInternalClient":true}}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.639+00:00"},"s":"I",  "c":"TENANT_M", "id":7091600, "ctx":"main","msg":"Starting TenantMigrationAccessBlockerRegistry"}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.639+00:00"},"s":"I",  "c":"CONTROL",  "id":4615611, "ctx":"initandlisten","msg":"MongoDB starting","attr":{"pid":1,"port":27017,"dbPath":"/data/db","architecture":"64-bit","host":"0b323621aca2"}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.639+00:00"},"s":"I",  "c":"CONTROL",  "id":23403,   "ctx":"initandlisten","msg":"Build Info","attr":{"buildInfo":{"version":"8.0.4","gitVersion":"bc35ab4305d9920d9d0491c1c9ef9b72383d31f9","openSSLVersion":"OpenSSL 3.0.13 30 Jan 2024","modules":[],"allocator":"tcmalloc-google","environment":{"distmod":"ubuntu2404","distarch":"x86_64","target_arch":"x86_64"}}}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.639+00:00"},"s":"I",  "c":"CONTROL",  "id":51765,   "ctx":"initandlisten","msg":"Operating System","attr":{"os":{"name":"Ubuntu","version":"24.04"}}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.639+00:00"},"s":"I",  "c":"CONTROL",  "id":21951,   "ctx":"initandlisten","msg":"Options set by command line","attr":{"options":{"net":{"bindIp":"*"}}}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.644+00:00"},"s":"I",  "c":"STORAGE",  "id":22270,   "ctx":"initandlisten","msg":"Storage engine to use detected by data files","attr":{"dbpath":"/data/db","storageEngine":"wiredTiger"}}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.644+00:00"},"s":"I",  "c":"STORAGE",  "id":22297,   "ctx":"initandlisten","msg":"Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem","tags":["startupWarnings"]}
+local_mongo  | {"t":{"$date":"2025-01-07T22:58:09.644+00:00"},"s":"I",  "c":"STORAGE",  "id":22315,   "ctx":"initandlisten","msg":"Opening WiredTiger","attr":{"config":"create,cache_size=3458M,session_max=33000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,remove=true,path=journal,compressor=snappy),builtin_extension_config=(zstd=(compression_level=6)),file_manager=(close_idle_time=600,close_scan_interval=10,close_handle_minimum=2000),statistics_log=(wait=0),json_output=(error,message),verbose=[recovery_progress:1,checkpoint_progress:1,compact_progress:1,backup:0,checkpoint:0,compact:0,evict:0,history_store:0,recovery:0,rts:0,salvage:0,tiered:0,timestamp:0,transaction:0,verify:0,log:0],prefetch=(available=true,default=false),"}}
+solana_agents  | 
+solana_agents  | > solana_agents@1.0.0 start
+solana_agents  | > node index.js
+solana_agents  | 
+quant_service  |   File "/usr/local/lib/python3.10/site-packages/uvicorn/server.py", line 77, in _serve
+quant_service  |     config.load()
+quant_service  |   File "/usr/local/lib/python3.10/site-packages/uvicorn/config.py", line 435, in load
+quant_service  |     self.loaded_app = import_from_string(self.app)
+quant_service  |   File "/usr/local/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+quant_service  |     module = importlib.import_module(module_str)
+quant_service  |   File "/usr/local/lib/python3.10/importlib/__init__.py", line 126, in import_module
+quant_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+quant_service  |   File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+quant_service  |   File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+quant_service  |   File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+quant_service  |   File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+quant_service  |   File "<frozen importlib._bootstrap_external>", line 879, in exec_module
+quant_service  |   File "<frozen importlib._bootstrap_external>", line 1017, in get_code
+quant_service  |   File "<frozen importlib._bootstrap_external>", line 947, in source_to_code
+quant_service  |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+quant_service  |   File "/app/main.py", line 119
+quant_service  |     // ========== ADVANCED MEMORY SYNERGY ==========
+quant_service  |     ^^
+quant_service  | SyntaxError: invalid syntax

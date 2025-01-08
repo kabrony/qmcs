@@ -1,0 +1,16 @@
+[INFO] 2025-01-06 14:52:30 - === Starting VOTS for Unified Dashboard System ===
+[INFO] 2025-01-06 14:52:30 - Checking OpenAI service health...
+[INFO] 2025-01-06 14:52:30 - OpenAI Service health: OK
+[INFO] 2025-01-06 14:52:30 - Fetching available models from openai_service...
+[INFO] 2025-01-06 14:52:30 - Model IDs response:\n
+[ERROR] 2025-01-06 14:52:30 - No model IDs found in response. Possibly 'data' is null or malformed.
+[INFO] 2025-01-06 14:52:30 - Checking basic chat completion with advanced model selection...
+[INFO] 2025-01-06 14:52:30 - Chat completion: PASSED
+[INFO] 2025-01-06 14:52:30 - Solana Agents health: OK
+[ERROR] 2025-01-06 14:52:30 - Failed to retrieve Solana block height (endpoint not implemented or error).
+[ERROR] 2025-01-06 14:52:30 - RAGChain service health check FAILED
+[ERROR] 2025-01-06 14:52:30 - Quant Service health check FAILED
+[ERROR] 2025-01-06 14:52:30 - Oracle Service health check FAILED
+[ERROR] 2025-01-06 14:52:30 - Argus Service health check FAILED
+[ERROR] 2025-01-06 14:52:30 - Overall status: FAILED. See vots_logs/unified_dashboard_check_20250106_145230.log for details.
+[INFO] 2025-01-06 14:52:30 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'vots_logs/unified_dashboard_check_20250106_145230.log'.

@@ -1,0 +1,26 @@
+[INFO] 2025-01-06 19:14:32 - === Starting VOTS for Unified Dashboard System ===
+[INFO] 2025-01-06 19:14:32 - Checking http://localhost:5103/health...
+[INFO] 2025-01-06 19:14:33 - openai_service health: OK
+[INFO] 2025-01-06 19:14:33 - Fetching /models from openai_service...
+[INFO] 2025-01-06 19:14:33 - Models returned:\ngpt-4o
+gpt-3.5-turbo
+o1
+o1-mini
+[INFO] 2025-01-06 19:14:33 - Alias 'gpt-4o' is found.
+[INFO] 2025-01-06 19:14:33 - Alias 'gpt-3.5-turbo' is found.
+[INFO] 2025-01-06 19:14:33 - Alias 'o1' is found.
+[INFO] 2025-01-06 19:14:33 - Alias 'o1-mini' is found.
+[INFO] 2025-01-06 19:14:33 - Testing /chat for basic chat completion...
+[INFO] 2025-01-06 19:14:33 - Chat completion: PASSED
+[INFO] 2025-01-06 19:14:33 - Storing doc with /add_doc, then asking a question with /ask...
+[INFO] 2025-01-06 19:14:33 - Successfully stored doc with 1 chunk(s).
+[ERROR] 2025-01-06 19:14:34 - Advanced Memory: /ask => Possibly incomplete. Answer: null
+[ERROR] 2025-01-06 19:14:34 - Solana Agents health check FAILED - no 200. Possibly wrong port or container down. Response:\n
+[ERROR] 2025-01-06 19:14:34 - RAGChain health check FAILED
+[INFO] 2025-01-06 19:14:34 - Quant Service health: OK
+[ERROR] 2025-01-06 19:14:34 - Quant-Redis check: FAILED (response != 'ok')
+[ERROR] 2025-01-06 19:14:34 - Quant-Mongo check: FAILED (response != 'ok')
+[INFO] 2025-01-06 19:14:34 - Oracle Service health: OK
+[ERROR] 2025-01-06 19:14:34 - Argus Service health check FAILED
+[ERROR] 2025-01-06 19:14:34 - Overall status: FAILED. See vots_logs/unified_dashboard_check_20250106_191432.log for details.
+[INFO] 2025-01-06 19:14:34 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'vots_logs/unified_dashboard_check_20250106_191432.log'.

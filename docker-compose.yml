@@ -1,79 +1,57 @@
+version: '3.9'
+
 services:
-<<<<<<< HEAD
-<<<<<<< HEAD
-  trilogy_app:
-    build: .
-    image: trilogy_app_image:latest
-    container_name: trilogy_app_container
-    ports:
-      - "8080:${PORT}"
-    env_file:
-      - .env
-=======
   solana_agents:
     build:
       context: ./solana_agents
       dockerfile: Dockerfile
     container_name: solana_agents
-    environment:
-      - SOLANA_RPC_URL=${SOLANA_RPC_URL}
-      - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
-      - MONGO_DETAILS=${MONGO_DETAILS}
-=======
-  mongo:
-    image: mongo:latest
-    container_name: qmcs-mongo
->>>>>>> 4632db42 (Add Argus as submodule)
     ports:
-      - "27017:27017"
-
-  solana_agents:
-    build: ./solana_agents
-    container_name: qmcs-solana_agents
-    ports:
-      - "5106:4000"
-
-  argus_service:
-    build: ./argus_service
-    container_name: argus_service
-    ports:
-      - "5101:5000"
-
-  oracle_service:
-    build: ./oracle_service
-    container_name: oracle_service
-    ports:
-      - "5102:5000"
-
-  openai_service:
-    build: ./openai_service
-    container_name: openai_service
-    ports:
-      - "5103:5000"
-    # Add environment file if needed:
+      - "4000:4000"
+    networks:
+      - app-network
+    restart: unless-stopped
     env_file:
       - .env
-    volumes:
-      - chroma_data:/app/chroma_storage
 
-  quant_service:
-    build: ./quant_service
-    container_name: quant_service
-    ports:
-      - "5104:5000"
-
-<<<<<<< HEAD
-networks:
-  default:
-    driver: bridge
->>>>>>> ad2001f2 (Update: Added logging, fixed MongoDB connection, updated Docker compose, and initial wallet stats endpoint)
-=======
   ragchain_service:
-    build: ./ragchain_service
+    build:
+      context: ./ragchain_service
+      dockerfile: Dockerfile
     container_name: ragchain_service
     ports:
       - "5105:5000"
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  quant_service:
+    build:
+      context: ./quant_service
+      dockerfile: Dockerfile
+    container_name: quant_service
+    ports:
+      - "7000:7000"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    container_name: local_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
 
 volumes:
-  chroma_data:
->>>>>>> 4632db42 (Add Argus as submodule)
+  mongo_data:
+
+networks:
+  app-network:
+    name: solais-network

@@ -1,7 +1,3 @@
-openai>=1.0.0
-python-dotenv>=1.0.0
-fastapi
+langchain-community
+# Add other initial dependencies here
 uvicorn
-requests
-pydantic
-httpx

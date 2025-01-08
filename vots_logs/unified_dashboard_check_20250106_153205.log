@@ -1,0 +1,24 @@
+[INFO] 2025-01-06 15:32:05 - === Starting VOTS for Unified Dashboard System ===
+[INFO] 2025-01-06 15:32:05 - Checking OpenAI service health...
+[INFO] 2025-01-06 15:32:05 - OpenAI Service health: OK
+[INFO] 2025-01-06 15:32:05 - Fetching available models from openai_service...
+[INFO] 2025-01-06 15:32:05 - Model IDs response:\ngpt-4o
+gpt-3.5-turbo
+o1
+o1-mini
+[INFO] 2025-01-06 15:32:05 - Required alias 'gpt-4o' is available.
+[ERROR] 2025-01-06 15:32:05 - Required alias 'gpt-4o-mini' is NOT found!
+[INFO] 2025-01-06 15:32:05 - Required alias 'o1' is available.
+[INFO] 2025-01-06 15:32:05 - Required alias 'o1-mini' is available.
+[INFO] 2025-01-06 15:32:05 - Checking basic chat completion with advanced model selection...
+[INFO] 2025-01-06 15:32:05 - Chat completion: PASSED
+[ERROR] 2025-01-06 15:32:06 - Solana Agents health check FAILED
+[INFO] 2025-01-06 15:32:06 - RAGChain service health: OK
+[ERROR] 2025-01-06 15:32:06 - RAGChain doc insertion: FAILED (not implemented or returned != true)
+[INFO] 2025-01-06 15:32:06 - Quant Service health: OK
+[ERROR] 2025-01-06 15:32:06 - Quant-Redis check: FAILED (endpoint /test_redis missing or not returning 'ok').
+[ERROR] 2025-01-06 15:32:06 - Quant-Mongo check: FAILED (endpoint /test_mongo missing or not returning 'ok').
+[INFO] 2025-01-06 15:32:06 - Oracle Service health: OK
+[INFO] 2025-01-06 15:32:06 - Argus Service health: OK
+[ERROR] 2025-01-06 15:32:06 - Overall status: FAILED. See vots_logs/unified_dashboard_check_20250106_153205.log for details.
+[INFO] 2025-01-06 15:32:06 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'vots_logs/unified_dashboard_check_20250106_153205.log'.

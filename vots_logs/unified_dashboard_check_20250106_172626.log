@@ -1,0 +1,18 @@
+[INFO] 2025-01-06 17:26:26 - === Starting VOTS for Unified Dashboard System ===
+[INFO] 2025-01-06 17:26:26 - Checking http://localhost:5103/health...
+[ERROR] 2025-01-06 17:26:26 - openai_service health check FAILED - no 200 from http://localhost:5103/health
+[INFO] 2025-01-06 17:26:26 - Fetching /models from openai_service...
+[ERROR] 2025-01-06 17:26:26 - No/empty response from http://localhost:5103/models
+[INFO] 2025-01-06 17:26:26 - Testing /chat for basic chat completion...
+[INFO] 2025-01-06 17:26:26 - Chat completion: PASSED
+[INFO] 2025-01-06 17:26:26 - Storing doc with /add_doc, then asking a question with /ask...
+[INFO] 2025-01-06 17:26:26 - Successfully stored doc with  chunk(s).
+[ERROR] 2025-01-06 17:26:26 - Advanced Memory: /ask => Possibly incomplete. Answer: 
+[ERROR] 2025-01-06 17:26:26 - Solana Agents health check FAILED - no 200. Possibly wrong port or container down. Response:\n
+[INFO] 2025-01-06 17:26:26 - RAGChain health: OK
+[INFO] 2025-01-06 17:26:26 - RAGChain doc insertion: PASSED
+[ERROR] 2025-01-06 17:26:27 - Quant Service health check FAILED
+[INFO] 2025-01-06 17:26:27 - Oracle Service health: OK
+[ERROR] 2025-01-06 17:26:27 - Argus Service health check FAILED
+[ERROR] 2025-01-06 17:26:27 - Overall status: FAILED. See vots_logs/unified_dashboard_check_20250106_172626.log for details.
+[INFO] 2025-01-06 17:26:27 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'vots_logs/unified_dashboard_check_20250106_172626.log'.

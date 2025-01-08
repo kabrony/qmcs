@@ -1,0 +1,6 @@
+[INFO] Starting finalize_autoscript.sh...
+[STEP 1] docker-compose down
+[STEP 2] docker-compose build --no-cache
+[STEP 3] docker-compose up -d
+[STEP 4] Short-tail logs (20 lines each container) to check for crash loops...
+[STEP 5] Container status: docker ps

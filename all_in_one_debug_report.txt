@@ -1,0 +1,1701 @@
+===============================================
+[1/6] Basic System / Docker Info
+===============================================
+Tue Jan  7 00:48:30 EST 2025
+
+[INFO] Docker version:
+Docker version 27.4.1, build b9d17ea
+[INFO] Docker Compose version:
+Docker Compose version v2.32.1
+[INFO] Python version (local):
+Python 3.12.3
+[INFO] OS Info (uname -a):
+Linux vots 6.8.0-51-generic #52-Ubuntu SMP PREEMPT_DYNAMIC Thu Dec  5 13:09:44 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+===============================================
+[2/6] Docker Compose Logs for Key Services
+===============================================
+-----------------------------------------------------------
+[LOGS for: argus_service]
+-----------------------------------------------------------
+argus_service  | INFO:     Started server process [1]
+argus_service  | INFO:     Waiting for application startup.
+argus_service  | INFO:     Application startup complete.
+argus_service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+
+-----------------------------------------------------------
+[LOGS for: oracle_service]
+-----------------------------------------------------------
+oracle_service  | INFO:     Started server process [1]
+oracle_service  | INFO:     Waiting for application startup.
+oracle_service  | INFO:     Application startup complete.
+oracle_service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+
+-----------------------------------------------------------
+[LOGS for: openai_service]
+-----------------------------------------------------------
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:48050 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:48054 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:48060 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:48076 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:48088 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:48090 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:48098 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:48100 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:48116 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38624 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38628 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38630 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38646 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38650 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38656 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38660 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38664 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38678 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38680 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38686 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38688 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38692 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38696 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38710 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38724 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38734 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38742 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:38748 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:38754 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:34194 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:34204 - "POST /ask HTTP/1.1" 500 Internal Server Error
+openai_service  | INFO:     172.18.0.1:34208 - "POST /add_doc HTTP/1.1" 200 OK
+openai_service  | ERROR:root:OpenAI API Error: Error code: 400 - {'error': {'message': 'you must provide a model parameter', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+openai_service  | INFO:     172.18.0.1:34222 - "POST /ask HTTP/1.1" 500 Internal Server Error
+
+-----------------------------------------------------------
+[LOGS for: quant_service]
+-----------------------------------------------------------
+quant_service  | INFO:     Started server process [1]
+quant_service  | INFO:     Waiting for application startup.
+quant_service  | INFO:     Application startup complete.
+quant_service  | INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+
+-----------------------------------------------------------
+[LOGS for: ragchain_service]
+-----------------------------------------------------------
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1161, in __call__
+ragchain_service  |     return self.main(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1082, in main
+ragchain_service  |     rv = self.invoke(ctx)
+ragchain_service  |          ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 1443, in invoke
+ragchain_service  |     return ctx.invoke(self.callback, **ctx.params)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/click/core.py", line 788, in invoke
+ragchain_service  |     return __callback(*args, **kwargs)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 412, in main
+ragchain_service  |     run(
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/main.py", line 579, in run
+ragchain_service  |     server.run()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 66, in run
+ragchain_service  |     return asyncio.run(self.serve(sockets=sockets))
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 194, in run
+ragchain_service  |     return runner.run(main)
+ragchain_service  |            ^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/asyncio/runners.py", line 118, in run
+ragchain_service  |     return self._loop.run_until_complete(task)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 70, in serve
+ragchain_service  |     await self._serve(sockets)
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/server.py", line 77, in _serve
+ragchain_service  |     config.load()
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/config.py", line 435, in load
+ragchain_service  |     self.loaded_app = import_from_string(self.app)
+ragchain_service  |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 22, in import_from_string
+ragchain_service  |     raise exc from None
+ragchain_service  |   File "/usr/local/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+ragchain_service  |     module = importlib.import_module(module_str)
+ragchain_service  |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "/usr/local/lib/python3.12/importlib/__init__.py", line 90, in import_module
+ragchain_service  |     return _bootstrap._gcd_import(name[level:], package, level)
+ragchain_service  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+ragchain_service  |   File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+ragchain_service  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+ragchain_service  |   File "/app/main.py", line 10, in <module>
+ragchain_service  |     from langchain_text_splitter import CharacterTextSplitter
+ragchain_service  | ModuleNotFoundError: No module named 'langchain_text_splitter'
+
+-----------------------------------------------------------
+[LOGS for: qmcs-solana_agents]
+-----------------------------------------------------------
+no such service: qmcs-solana_agents
+[WARNING] Unable to get logs for service 'qmcs-solana_agents'—maybe not running?
+
+===============================================
+[3/6] Local Dockerfile / Code Dump
+===============================================
+[3A] Dockerfiles
+-----------------------------------------------------------
+[DOCKERFILE: Dockerfile]
+-----------------------------------------------------------
+FROM python:3.12-slim
+WORKDIR /app
+
+# Copy only requirements first to allow Docker caching
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the code
+COPY . /app
+
+# Expose the port dynamically from .env
+EXPOSE ${PORT}
+
+# Example startup command: run a Python module from src/main.py
+CMD [ "python", "-m", "src.main" ]
+
+-----------------------------------------------------------
+[DOCKERFILE: argus_service/Dockerfile]
+-----------------------------------------------------------
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+-----------------------------------------------------------
+[DOCKERFILE: oracle_service/Dockerfile]
+-----------------------------------------------------------
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+-----------------------------------------------------------
+[DOCKERFILE: openai_service/Dockerfile]
+-----------------------------------------------------------
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# 1) Copy & install requirements
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 2) Copy source code
+COPY . /app
+
+# 3) Launch on port 5000
+EXPOSE 5000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+-----------------------------------------------------------
+[DOCKERFILE: quant_service/Dockerfile]
+-----------------------------------------------------------
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+-----------------------------------------------------------
+[DOCKERFILE: ragchain_service/Dockerfile]
+-----------------------------------------------------------
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copy and install requirements into the virtual environment
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip
+
+# Copy the rest of the code
+COPY . /app
+
+# Use python from within the virtual environment
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+
+-----------------------------------------------------------
+[DOCKERFILE: solana_agents/Dockerfile]
+-----------------------------------------------------------
+# Dockerfile for solana_agents without agent-twitter-client
+FROM node:18-slim
+
+WORKDIR /app
+COPY . /app
+
+# We remove agent-twitter-client from the npm install list
+RUN npm install \
+    express \
+    node-cron \
+    dotenv \
+    axios \
+    @solana/web3.js
+
+EXPOSE 4000
+CMD ["npm", "start"]
+
+[3B] main.py / requirements.txt in subfolders
+-----------------------------------------------------------
+[SUBFOLDER: argus_service]
+-----------------------------------------------------------
+==> argus_service/requirements.txt:
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+psutil
+
+==> argus_service/main.py:
+import psutil
+import os
+import httpx
+import traceback
+from fastapi import FastAPI
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 'healthy' to match VOTS expectations
+    return {"status": "healthy", "service": "argus_service"}
+
+@app.get("/metrics")
+async def get_metrics():
+    mem = psutil.virtual_memory()
+    cpu_percent = psutil.cpu_percent(interval=1)
+    return {
+        "cpu_usage": cpu_percent,
+        "memory_usage": f"{mem.percent:.2f}%"
+    }
+
+@app.get("/test_solana_agents")
+async def check_solana_health():
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get("http://solana_agents:5106/health", timeout=5)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            return {"status": "error","message":"No response from solana_agents service"}
+    except Exception as e:
+        traceback.print_exc()
+        return {"status":"error","message":str(e)}
+
+-----------------------------------------------------------
+[SUBFOLDER: oracle_service]
+-----------------------------------------------------------
+==> oracle_service/requirements.txt:
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+==> oracle_service/main.py:
+import os
+import requests
+import asyncio
+import traceback
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 200 + "status: healthy" to align with typical checks
+    return {"status": "healthy","service":"oracle_service"}
+
+@app.get("/get_external_data")
+async def get_external_data():
+    """Placeholder for fetching external data from an external API."""
+    return {"message": "Endpoint for external data usage."}
+
+-----------------------------------------------------------
+[SUBFOLDER: openai_service]
+-----------------------------------------------------------
+==> openai_service/requirements.txt:
+# For advanced memory with LangChain + Chroma:
+langchain>=0.0.200
+langchain-chroma>=0.0.2
+langchain-openai>=0.0.7
+langchain-community>=0.0.4
+
+# The latest OpenAI library (1.0+):
+openai>=1.0.0
+
+# Basic Python + FastAPI + etc
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+==> openai_service/main.py:
+import os
+import openai
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import uvicorn
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_text_splitters import CharacterTextSplitter
+from langchain_core.documents import Document
+import asyncio
+from datetime import datetime
+import logging
+
+load_dotenv()
+
+app = FastAPI(
+    title="OpenAI Service w/ Advanced Memory",
+    description="Stores doc embeddings, uses openai.chat.completions, returns health checks.",
+    version="1.0.0",
+)
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+###############################################################################
+# 2) CREATE EMBEDDINGS + CHROMA STORE
+###############################################################################
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+###############################################################################
+# 3) DATA MODELS
+###############################################################################
+class AddDocRequest(BaseModel):
+    text: str
+    chunk_size: int = 200
+    chunk_overlap: int = 20
+
+class AskRequest(BaseModel):
+    query: str
+    k: Optional[int] = 3
+
+###############################################################################
+# 4) CHOOSE MODEL (SIMPLE EXAMPLE)
+###############################################################################
+MODEL_MAP = {
+    "simple": ["gpt-4o-mini-2024-07-18", "gpt-4o-mini"],
+    "reasoning": ["o1-mini-2024-09-12", "o1-mini"],
+    "complex_generation": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "code_generation": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "realtime": ["gpt-4o-realtime-preview-2024-12-17", "gpt-4o-realtime-preview"],
+    "audio": ["gpt-4o-audio-preview-2024-12-17", "gpt-4o-audio-preview"],
+    "image_analysis": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "fine_tuning": ["gpt-4o-mini-2024-07-18", "gpt-4o-mini"]
+}
+
+def select_model(category: str, available_models: List[str]) -> Optional[str]:
+    """
+    Attempts to pick the best snapshot from MODEL_MAP[category].
+     If none of the snapshots are found in ,
+     returns None (or you might raise an exception).
+    """
+    snapshots = MODEL_MAP.get(category, [])
+    for candidate in snapshots:
+        if candidate in available_models:
+            return candidate
+    return None
+
+###############################################################################
+# 5) FASTAPI APP
+###############################################################################
+
+@app.post("/add_doc")
+async def add_doc(req: AddDocRequest):
+    logging.info(f"Received add_doc request (chunk_size={req.chunk_size}, overlap={req.chunk_overlap})")
+    splitter = CharacterTextSplitter(
+        separator=" ",
+        chunk_size=req.chunk_size,
+        chunk_overlap=req.chunk_overlap
+    )
+    chunks = splitter.split_text(req.text)
+    docs = [Document(page_content=chunk) for chunk in chunks]
+
+    vectorstore.add_documents(docs)
+    return {
+        "message": f"Stored {len(chunks)} chunk(s) in the vector store.",
+        "chunks": chunks
+        }
+
+@app.post("/ask")
+async def ask(req: AskRequest):
+    logging.info(f"Received ask request: query='{req.query}', k={req.k}")
+    relevant_docs = vectorstore.similarity_search(req.query, k=req.k or 3)
+    combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+
+    system_prompt = (
+        "You are an AI assistant with knowledge from these docs:\n"
+        f"{combined_text}\n\n"
+        "Answer the user's question based on these docs. "
+        "If you don't find relevant info, say you are unsure."
+    )
+
+    try:
+        chosen_model = select_model(req.query, ["gpt-4o", "gpt-3.5-turbo", "o1-mini", "o1"] )
+        logging.info(f"Choosing model: {chosen_model}")
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await client.chat.completions.create(
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": req.query}
+            ],
+            temperature=0.7,
+        )
+        answer = response.choices[0].message.content.strip()
+        return {
+                "answer": answer,
+                "chosen_model": chosen_model,
+                "docsUsed": [d.page_content for d in relevant_docs]
+            }
+    except openai.APIError as e:
+        logging.error(f"OpenAI API Error: {e}")
+        raise HTTPException(status_code=500, detail=f"OpenAI API Error: {e}")
+    except Exception as e:
+        logging.error(f"Error processing ask request: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# For listing models (the VOTS script expects certain IDs to appear)
+class OpenAIModel(BaseModel):
+    id: str
+
+class OpenAIModelList(BaseModel):
+    data: List[OpenAIModel]
+
+@app.get("/models", response_model=OpenAIModelList)
+async def list_models():
+    """
+    Returns a list of available models.
+     Adjust as needed to match real usage or fetch from OpenAI's live /models.
+    """
+    available_models = [
+       {"id": "gpt-4o"},
+        {"id": "gpt-3.5-turbo"},
+       {"id": "o1"},
+       {"id": "o1-mini"}
+    ]
+    return {"data": available_models}
+
+@app.post("/chat")
+async def chat_endpoint(payload: Dict):
+    logging.info(f"Received chat request: {payload}")
+    try:
+        user_message = payload.get("messages", [{"role": "user", "content": ""}])[-1]["content"]
+        chosen_model = choose_model_based_on_complexity(user_message);
+        logging.info(f"Chat endpoint using model: {chosen_model}")
+
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await client.chat.completions.create(
+            model=chosen_model,
+            messages=[{"role": "user", "content": user_message}],
+            temperature=0.7,
+             )
+        if response.choices[0].message is None:
+            return {"model_used": chosen_model, "answer": None}
+        answer = response.choices[0].message.content.strip()
+        return {
+        "model_used": chosen_model,
+        "answer": answer
+        }
+    except openai.APIError as e:
+        logging.error(f"OpenAI API Error in chat: {e}")
+        raise HTTPException(status_code=500, detail=f"OpenAI API Error: {e}")
+    except Exception as e:
+        logging.error(f"Error in chat_endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+          "timestamp": datetime.utcnow().isoformat()
+     }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000, reload=False)
+
+-----------------------------------------------------------
+[SUBFOLDER: quant_service]
+-----------------------------------------------------------
+==> quant_service/requirements.txt:
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+==> quant_service/main.py:
+import os
+import requests
+import asyncio
+import traceback
+import openai
+import time
+import random
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+SOLANA_AGENTS_URL = os.getenv("SOLANA_AGENTS_URL","http://solana_agents:5106")
+RAGCHAIN_SERVICE_URL= os.getenv("RAGCHAIN_SERVICE_URL","http://ragchain_service:5105")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+QUANT_SERVICE_URL= os.getenv("QUANT_SERVICE_URL","http://quant_service:5104")
+
+developer_wallet_count = 0
+volume = 0
+launch_start_time = time.time()
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service":"quant_service"}
+
+@app.get("/test_redis")
+def test_redis():
+    # If you do not have Redis integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.get("/test_mongo")
+def test_mongo():
+    # If you do not have Mongo integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.post("/trade")
+async def do_trade(data: dict):
+    try:
+        rag_response = await get_ragchain_ideas()
+        print("RAGChain response:", rag_response)
+        resp = await process_with_retry(
+            requests.post,
+            f"{SOLANA_AGENTS_URL}/trade",
+            json=data,
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.get("/pump-signals/{token}")
+async def get_pump_signals(token: str):
+    global developer_wallet_count, volume, launch_start_time
+    developer_wallet_count += random.randint(0,5)
+    volume += random.randint(10,200)
+    time_since_start = time.time() - launch_start_time
+    hype_score = (developer_wallet_count * 0.3) + (volume * 0.2) + (time_since_start*0.1)
+    return {
+        "dev_whale_activity": developer_wallet_count,
+        "social_score": hype_score,
+        "volume_score": volume
+    }
+
+@app.get("/get-ragchain-ideas")
+async def get_ragchain_ideas():
+    try:
+        resp = await process_with_retry(
+            requests.get,
+            f"{RAGCHAIN_SERVICE_URL}/ephemeral_ideas",
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.post("/decide")
+async def make_decision(context: dict):
+    try:
+        pump_signals = await process_with_retry(
+            requests.get,
+            f"{QUANT_SERVICE_URL}/pump-signals/SOL",
+            timeout=10
+        )
+        pump_signals.raise_for_status()
+        # Minimal usage of openai
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        openai_response = await process_with_retry(
+            client.chat.completions.create,
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"user","content":f"Generate a quick decision on: {pump_signals.text}"}
+            ],
+            temperature=0.7,
+        )
+        ans = openai_response.choices[0].message.content
+        return {"execute":True, "reason":"Testing", "openai_response":ans}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def process_with_retry(call, url: str, *args, **kwargs):
+    for attempt in range(3):
+        try:
+            response = await asyncio.wait_for(call(url, *args, **kwargs), timeout=10)
+            response.raise_for_status()
+            return response
+        except Exception as e:
+            if attempt==2:
+                raise
+            await asyncio.sleep(2**attempt)
+
+-----------------------------------------------------------
+[SUBFOLDER: ragchain_service]
+-----------------------------------------------------------
+==> ragchain_service/requirements.txt:
+fastapi==0.109.2
+uvicorn
+openai>=1.0.0
+python-dotenv>=1.0.0
+langchain-openai
+langchain-chroma
+chromadb
+google-generativeai
+motor
+tenacity
+requests
+pydantic
+httpx
+
+==> ragchain_service/main.py:
+import os
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from tenacity import retry, stop_after_attempt, wait_fixed
+import asyncio
+from datetime import datetime
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_text_splitter import CharacterTextSplitter
+from langchain_core.documents import Document
+import openai
+import uvicorn
+import logging
+from fastapi import FastAPI
+import google.generativeai as genai
+
+load_dotenv()
+app = FastAPI()
+
+MONGO_URL = os.getenv("MONGO_URL","mongodb://mongo:27017")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+db_client = None
+ephemeral_thoughts = []
+
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Model options: "gemini-pro", "gemini-ultra" (if available)
+gemini_model = genai.GenerativeModel('gemini-pro')
+
+
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
+async def connect_to_mongo():
+    global db_client
+    db_client = AsyncIOMotorClient(MONGO_URL)
+    result = await db_client.admin.command("ping")
+    logging.info(f"[ragchain_service] ping: {result}")
+
+@app.on_event("startup")
+async def startup_event():
+    await connect_to_mongo()
+    logging.info("[ragchain_service] Connected to Mongo (async).")
+
+@app.get("/")
+async def root():
+    return {"status":"ragchain_service running"}
+
+@app.get("/health")
+async def health():
+    return {"status":"ok", "service":"ragchain_service"}
+
+@app.post("/store_thought/")
+async def store_thought(thought: str):
+    global ephemeral_thoughts
+    ephemeral_thoughts.append({
+        "id": len(ephemeral_thoughts),
+        "text": thought,
+        "time": str(datetime.now())
+    })
+    return {"message":"Stored Ephemeral Thought"}
+
+@app.get("/ephemeral_ideas")
+async def get_ephemeral_ideas():
+    return {"data": ephemeral_thoughts}
+
+@app.post("/add_doc")
+async def add_doc(text: str, chunk_size: int=200, chunk_overlap: int=20):
+    splitter = CharacterTextSplitter(
+        separator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+    chunks = splitter.split_text(text)
+    docs = [Document(page_content=chunk) for chunk in chunks]
+    vectorstore.add_documents(docs)
+    return {"message":"Stored Documents", "chunks": chunks}
+
+@app.post("/ask")
+async def ask(query: str, k: int=3, use_gemini: bool = False):
+    try:
+      if use_gemini:
+          response = gemini_model.generate_content(query)
+          ans = response.text
+          return {"answer": ans, "docsUsed":[]} # No document context with Gemini for now.
+      else:
+        relevant_docs = vectorstore.similarity_search(query, k=k or 3)
+        combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+        prompt = (
+            "You are an AI with knowledge from docs:\n"
+            f"{combined_text}\n\n"
+            "Answer user question. If not found, say 'unsure'."
+        )
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"system","content":prompt},
+                {"role":"user","content":query}
+            ],
+            temperature=0.7
+        )
+        ans = response.choices[0].message.content.strip() if response.choices[0].message else None
+        return {"answer": ans, "docsUsed":[d.page_content for d in relevant_docs]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000)
+
+-----------------------------------------------------------
+[SUBFOLDER: solana_agents]
+-----------------------------------------------------------
+==> solana_agents/index.js:
+require('dotenv').config();
+const axios = require('axios');
+const cron = require('node-cron');
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+const {
+  Connection,
+  Keypair,
+  Transaction,
+  SystemProgram,
+  sendAndConfirmTransaction,
+  PublicKey
+} = require("@solana/web3.js");
+
+const { v4: uuidv4 } = require('uuid');
+
+const logger = {
+  info: (...args) => console.log(new Date().toISOString(), "[INFO]", ...args),
+  error: (...args) => console.error(new Date().toISOString(), "[ERROR]", ...args),
+  warn: (...args) => console.warn(new Date().toISOString(), "[WARN]", ...args),
+};
+
+const PORT = process.env.PORT || 4000;
+const RAGCHAIN_SERVICE_URL = process.env.RAGCHAIN_SERVICE_URL;
+const QUANT_SERVICE_URL = process.env.QUANT_SERVICE_URL;
+const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL;
+const SOLANA_PRIVATE_KEY = process.env.SOLANA_PRIVATE_KEY;
+const TWITTER_USERNAME = process.env.TWITTER_USERNAME;
+const TWITTER_PASSWORD = process.env.TWITTER_PASSWORD;
+const TWITTER_EMAIL = process.env.TWITTER_EMAIL;
+
+logger.info("Starting solana_agents with config:", {
+  PORT, QUANT_SERVICE_URL, SOLANA_RPC_URL
+});
+
+/**
+ * For now, we remove all references to 'agent-twitter-client' and simply omit any tweet scraping logic.
+ * If you want to re-implement Twitter functionality with a different library, you can add it here later.
+ */
+
+app.get('/health', (req, res) => {
+  res.status(200).send({ status: "ok", publicKey: process.env.SOLANA_PUBLIC_KEY });
+});
+
+async function processTransaction(token, amount) {
+  if (!SOLANA_PRIVATE_KEY) {
+    throw new Error('Missing SOLANA_PRIVATE_KEY');
+  }
+
+  const connection = new Connection(SOLANA_RPC_URL);
+  const keypair = Keypair.fromSecretKey(
+    Uint8Array.from(Buffer.from(SOLANA_PRIVATE_KEY, 'base64'))
+  );
+  const toPublicKey = new PublicKey(process.env.SOLANA_PUBLIC_KEY);
+  const lamports = amount * 1000000000;
+
+  // Create a transaction to transfer lamports
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: keypair.publicKey,
+      toPubkey: toPublicKey,
+      lamports: lamports,
+    })
+  );
+
+  logger.info('Attempting to send lamports to ', toPublicKey);
+
+  try {
+    const signature = await sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [keypair]
+    );
+    logger.info('Solana Transaction successful:', signature);
+    return { success: true, signature: signature };
+  } catch (e) {
+    logger.error('Solana Transaction failed:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+// Example CRON: daily tasks at midnight
+cron.schedule('0 0 * * *', async () => {
+  logger.info('Running daily tasks...');
+  // Example call to quant_service
+  try {
+    const response = await axios.get(`${QUANT_SERVICE_URL}/health`);
+    console.log('Response from quant_service:', response.data);
+  } catch (error) {
+    console.error('Error contacting quant service:', error);
+  }
+});
+
+// (We remove the tweet scraping function since agent-twitter-client is no longer used.)
+
+app.post('/trade', async (req, res) => {
+  const data = req.body;
+  logger.info("Received trade request: ", data);
+
+  // Instead of scraping tweets, we do no extra step here
+  const result = await processTransaction("SOL", 0.1);
+  res.status(200).send({
+    message: "Trading logic is a placeholder (agent-twitter-client removed).",
+    solana: result
+  });
+});
+
+app.listen(PORT, () => {
+  logger.info(`solana_agents listening on port ${PORT}`);
+});
+
+===============================================
+[4/6] Docker Container File Dumps
+===============================================
+-----------------------------------------------------------
+[Container: argus_service] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+psutil
+
+import psutil
+import os
+import httpx
+import traceback
+from fastapi import FastAPI
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 'healthy' to match VOTS expectations
+    return {"status": "healthy", "service": "argus_service"}
+
+@app.get("/metrics")
+async def get_metrics():
+    mem = psutil.virtual_memory()
+    cpu_percent = psutil.cpu_percent(interval=1)
+    return {
+        "cpu_usage": cpu_percent,
+        "memory_usage": f"{mem.percent:.2f}%"
+    }
+
+@app.get("/test_solana_agents")
+async def check_solana_health():
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get("http://solana_agents:5106/health", timeout=5)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            return {"status": "error","message":"No response from solana_agents service"}
+    except Exception as e:
+        traceback.print_exc()
+        return {"status":"error","message":str(e)}
+
+-----------------------------------------------------------
+[Container: oracle_service] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+import os
+import requests
+import asyncio
+import traceback
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 200 + "status: healthy" to align with typical checks
+    return {"status": "healthy","service":"oracle_service"}
+
+@app.get("/get_external_data")
+async def get_external_data():
+    """Placeholder for fetching external data from an external API."""
+    return {"message": "Endpoint for external data usage."}
+
+-----------------------------------------------------------
+[Container: openai_service] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+# For advanced memory with LangChain + Chroma:
+langchain>=0.0.200
+langchain-chroma>=0.0.2
+langchain-openai>=0.0.7
+langchain-community>=0.0.4
+
+# The latest OpenAI library (1.0+):
+openai>=1.0.0
+
+# Basic Python + FastAPI + etc
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+import os
+import openai
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import uvicorn
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_text_splitters import CharacterTextSplitter
+from langchain_core.documents import Document
+import asyncio
+from datetime import datetime
+import logging
+
+load_dotenv()
+
+app = FastAPI(
+    title="OpenAI Service w/ Advanced Memory",
+    description="Stores doc embeddings, uses openai.chat.completions, returns health checks.",
+    version="1.0.0",
+)
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+###############################################################################
+# 2) CREATE EMBEDDINGS + CHROMA STORE
+###############################################################################
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+###############################################################################
+# 3) DATA MODELS
+###############################################################################
+class AddDocRequest(BaseModel):
+    text: str
+    chunk_size: int = 200
+    chunk_overlap: int = 20
+
+class AskRequest(BaseModel):
+    query: str
+    k: Optional[int] = 3
+
+###############################################################################
+# 4) CHOOSE MODEL (SIMPLE EXAMPLE)
+###############################################################################
+MODEL_MAP = {
+    "simple": ["gpt-4o-mini-2024-07-18", "gpt-4o-mini"],
+    "reasoning": ["o1-mini-2024-09-12", "o1-mini"],
+    "complex_generation": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "code_generation": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "realtime": ["gpt-4o-realtime-preview-2024-12-17", "gpt-4o-realtime-preview"],
+    "audio": ["gpt-4o-audio-preview-2024-12-17", "gpt-4o-audio-preview"],
+    "image_analysis": ["gpt-4o-2024-08-06", "gpt-4o"],
+    "fine_tuning": ["gpt-4o-mini-2024-07-18", "gpt-4o-mini"]
+}
+
+def select_model(category: str, available_models: List[str]) -> Optional[str]:
+    """
+    Attempts to pick the best snapshot from MODEL_MAP[category].
+     If none of the snapshots are found in ,
+     returns None (or you might raise an exception).
+    """
+    snapshots = MODEL_MAP.get(category, [])
+    for candidate in snapshots:
+        if candidate in available_models:
+            return candidate
+    return None
+
+###############################################################################
+# 5) FASTAPI APP
+###############################################################################
+
+@app.post("/add_doc")
+async def add_doc(req: AddDocRequest):
+    logging.info(f"Received add_doc request (chunk_size={req.chunk_size}, overlap={req.chunk_overlap})")
+    splitter = CharacterTextSplitter(
+        separator=" ",
+        chunk_size=req.chunk_size,
+        chunk_overlap=req.chunk_overlap
+    )
+    chunks = splitter.split_text(req.text)
+    docs = [Document(page_content=chunk) for chunk in chunks]
+
+    vectorstore.add_documents(docs)
+    return {
+        "message": f"Stored {len(chunks)} chunk(s) in the vector store.",
+        "chunks": chunks
+        }
+
+@app.post("/ask")
+async def ask(req: AskRequest):
+    logging.info(f"Received ask request: query='{req.query}', k={req.k}")
+    relevant_docs = vectorstore.similarity_search(req.query, k=req.k or 3)
+    combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+
+    system_prompt = (
+        "You are an AI assistant with knowledge from these docs:\n"
+        f"{combined_text}\n\n"
+        "Answer the user's question based on these docs. "
+        "If you don't find relevant info, say you are unsure."
+    )
+
+    try:
+        chosen_model = select_model(req.query, ["gpt-4o", "gpt-3.5-turbo", "o1-mini", "o1"] )
+        logging.info(f"Choosing model: {chosen_model}")
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await client.chat.completions.create(
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": req.query}
+            ],
+            temperature=0.7,
+        )
+        answer = response.choices[0].message.content.strip()
+        return {
+                "answer": answer,
+                "chosen_model": chosen_model,
+                "docsUsed": [d.page_content for d in relevant_docs]
+            }
+    except openai.APIError as e:
+        logging.error(f"OpenAI API Error: {e}")
+        raise HTTPException(status_code=500, detail=f"OpenAI API Error: {e}")
+    except Exception as e:
+        logging.error(f"Error processing ask request: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# For listing models (the VOTS script expects certain IDs to appear)
+class OpenAIModel(BaseModel):
+    id: str
+
+class OpenAIModelList(BaseModel):
+    data: List[OpenAIModel]
+
+@app.get("/models", response_model=OpenAIModelList)
+async def list_models():
+    """
+    Returns a list of available models.
+     Adjust as needed to match real usage or fetch from OpenAI's live /models.
+    """
+    available_models = [
+       {"id": "gpt-4o"},
+        {"id": "gpt-3.5-turbo"},
+       {"id": "o1"},
+       {"id": "o1-mini"}
+    ]
+    return {"data": available_models}
+
+@app.post("/chat")
+async def chat_endpoint(payload: Dict):
+    logging.info(f"Received chat request: {payload}")
+    try:
+        user_message = payload.get("messages", [{"role": "user", "content": ""}])[-1]["content"]
+        chosen_model = choose_model_based_on_complexity(user_message);
+        logging.info(f"Chat endpoint using model: {chosen_model}")
+
+        client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = await client.chat.completions.create(
+            model=chosen_model,
+            messages=[{"role": "user", "content": user_message}],
+            temperature=0.7,
+             )
+        if response.choices[0].message is None:
+            return {"model_used": chosen_model, "answer": None}
+        answer = response.choices[0].message.content.strip()
+        return {
+        "model_used": chosen_model,
+        "answer": answer
+        }
+    except openai.APIError as e:
+        logging.error(f"OpenAI API Error in chat: {e}")
+        raise HTTPException(status_code=500, detail=f"OpenAI API Error: {e}")
+    except Exception as e:
+        logging.error(f"Error in chat_endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+          "timestamp": datetime.utcnow().isoformat()
+     }
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000, reload=False)
+
+-----------------------------------------------------------
+[Container: quant_service] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+
+import os
+import requests
+import asyncio
+import traceback
+import openai
+import time
+import random
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+SOLANA_AGENTS_URL = os.getenv("SOLANA_AGENTS_URL","http://solana_agents:5106")
+RAGCHAIN_SERVICE_URL= os.getenv("RAGCHAIN_SERVICE_URL","http://ragchain_service:5105")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+QUANT_SERVICE_URL= os.getenv("QUANT_SERVICE_URL","http://quant_service:5104")
+
+developer_wallet_count = 0
+volume = 0
+launch_start_time = time.time()
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service":"quant_service"}
+
+@app.get("/test_redis")
+def test_redis():
+    # If you do not have Redis integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.get("/test_mongo")
+def test_mongo():
+    # If you do not have Mongo integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.post("/trade")
+async def do_trade(data: dict):
+    try:
+        rag_response = await get_ragchain_ideas()
+        print("RAGChain response:", rag_response)
+        resp = await process_with_retry(
+            requests.post,
+            f"{SOLANA_AGENTS_URL}/trade",
+            json=data,
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.get("/pump-signals/{token}")
+async def get_pump_signals(token: str):
+    global developer_wallet_count, volume, launch_start_time
+    developer_wallet_count += random.randint(0,5)
+    volume += random.randint(10,200)
+    time_since_start = time.time() - launch_start_time
+    hype_score = (developer_wallet_count * 0.3) + (volume * 0.2) + (time_since_start*0.1)
+    return {
+        "dev_whale_activity": developer_wallet_count,
+        "social_score": hype_score,
+        "volume_score": volume
+    }
+
+@app.get("/get-ragchain-ideas")
+async def get_ragchain_ideas():
+    try:
+        resp = await process_with_retry(
+            requests.get,
+            f"{RAGCHAIN_SERVICE_URL}/ephemeral_ideas",
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.post("/decide")
+async def make_decision(context: dict):
+    try:
+        pump_signals = await process_with_retry(
+            requests.get,
+            f"{QUANT_SERVICE_URL}/pump-signals/SOL",
+            timeout=10
+        )
+        pump_signals.raise_for_status()
+        # Minimal usage of openai
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        openai_response = await process_with_retry(
+            client.chat.completions.create,
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"user","content":f"Generate a quick decision on: {pump_signals.text}"}
+            ],
+            temperature=0.7,
+        )
+        ans = openai_response.choices[0].message.content
+        return {"execute":True, "reason":"Testing", "openai_response":ans}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def process_with_retry(call, url: str, *args, **kwargs):
+    for attempt in range(3):
+        try:
+            response = await asyncio.wait_for(call(url, *args, **kwargs), timeout=10)
+            response.raise_for_status()
+            return response
+        except Exception as e:
+            if attempt==2:
+                raise
+            await asyncio.sleep(2**attempt)
+
+-----------------------------------------------------------
+[Container: ragchain_service] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+Error response from daemon: Container ab380b99c136367be0f3550b51c3f52a48d4f5532de79faf38b9b6ceec37b5fa is restarting, wait until the container is running
+[INFO] No /app/requirements in container ragchain_service.
+
+Error response from daemon: Container ab380b99c136367be0f3550b51c3f52a48d4f5532de79faf38b9b6ceec37b5fa is restarting, wait until the container is running
+[INFO] No /app/main.py in container ragchain_service.
+
+-----------------------------------------------------------
+[Container: qmcs-solana_agents] cat /app/main.py && requirements.txt
+-----------------------------------------------------------
+[INFO] No /app/requirements in container qmcs-solana_agents.
+
+cat: /app/main.py: No such file or directory
+[INFO] No /app/main.py in container qmcs-solana_agents.
+
+===============================================
+[5/6] Checking for Potential Missing Python Dependencies
+===============================================
+[local pip freeze]
+attrs==23.2.0
+Automat==22.10.0
+Babel==2.10.3
+bcc==0.29.1
+bcrypt==3.2.2
+blinker==1.7.0
+boto3==1.34.46
+botocore==1.34.46
+certifi==2023.11.17
+chardet==5.2.0
+click==8.1.6
+cloud-init==24.4
+colorama==0.4.6
+command-not-found==0.3
+configobj==5.0.8
+constantly==23.10.4
+cryptography==41.0.7
+dbus-python==1.3.2
+distro==1.9.0
+distro-info==1.7+build1
+gyp==0.1
+h11==0.14.0
+httplib2==0.20.4
+hyperlink==21.0.0
+idna==3.6
+incremental==22.10.0
+Jinja2==3.1.2
+jmespath==1.0.1
+jsonpatch==1.32
+jsonpointer==2.0
+jsonschema==4.10.3
+launchpadlib==1.11.0
+lazr.restfulclient==0.14.6
+lazr.uri==1.0.6
+markdown-it-py==3.0.0
+MarkupSafe==2.1.5
+mdurl==0.1.2
+netaddr==0.8.0
+netifaces==0.11.0
+oauthlib==3.2.2
+packaging==24.0
+pathspec==0.12.1
+pexpect==4.9.0
+ptyprocess==0.7.0
+pyasn1==0.4.8
+pyasn1-modules==0.2.8
+Pygments==2.17.2
+PyGObject==3.48.2
+PyHamcrest==2.1.0
+PyJWT==2.7.0
+pyOpenSSL==23.2.0
+pyparsing==3.1.1
+pyrsistent==0.20.0
+pyserial==3.5
+python-apt==2.7.7+ubuntu3
+python-dateutil==2.8.2
+python-debian==0.1.49+ubuntu2
+python-magic==0.4.27
+pytz==2024.1
+PyYAML==6.0.1
+requests==2.31.0
+rich==13.7.1
+s3transfer==0.10.1
+service-identity==24.1.0
+setuptools==68.1.2
+six==1.16.0
+sos==4.7.2
+ssh-import-id==5.11
+systemd-python==235
+Twisted==24.3.0
+typing_extensions==4.10.0
+ubuntu-pro-client==8001
+ufw==0.36.2
+unattended-upgrades==0.1
+urllib3==2.0.7
+uvicorn==0.27.1
+uvloop==0.19.0
+wadllib==1.3.6
+wheel==0.42.0
+wsproto==1.2.0
+yamllint==1.33.0
+zope.interface==6.1
+
+-----------------------------------------------------------
+[Container: argus_service] pip freeze
+-----------------------------------------------------------
+annotated-types==0.7.0
+anyio==4.8.0
+certifi==2024.12.14
+charset-normalizer==3.4.1
+click==8.1.8
+distro==1.9.0
+exceptiongroup==1.2.2
+fastapi==0.115.6
+h11==0.14.0
+httpcore==1.0.7
+httpx==0.28.1
+idna==3.10
+jiter==0.8.2
+openai==1.59.3
+psutil==6.1.1
+pydantic==2.10.4
+pydantic_core==2.27.2
+python-dotenv==1.0.1
+requests==2.32.3
+sniffio==1.3.1
+starlette==0.41.3
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.3.0
+uvicorn==0.34.0
+
+-----------------------------------------------------------
+[Container: oracle_service] pip freeze
+-----------------------------------------------------------
+annotated-types==0.7.0
+anyio==4.8.0
+certifi==2024.12.14
+charset-normalizer==3.4.1
+click==8.1.8
+distro==1.9.0
+exceptiongroup==1.2.2
+fastapi==0.115.6
+h11==0.14.0
+httpcore==1.0.7
+httpx==0.28.1
+idna==3.10
+jiter==0.8.2
+openai==1.59.3
+pydantic==2.10.4
+pydantic_core==2.27.2
+python-dotenv==1.0.1
+requests==2.32.3
+sniffio==1.3.1
+starlette==0.41.3
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.3.0
+uvicorn==0.34.0
+
+-----------------------------------------------------------
+[Container: openai_service] pip freeze
+-----------------------------------------------------------
+aiohappyeyeballs==2.4.4
+aiohttp==3.11.11
+aiosignal==1.3.2
+annotated-types==0.7.0
+anyio==4.8.0
+asgiref==3.8.1
+async-timeout==4.0.3
+attrs==24.3.0
+backoff==2.2.1
+bcrypt==4.2.1
+build==1.2.2.post1
+cachetools==5.5.0
+certifi==2024.12.14
+charset-normalizer==3.4.1
+chroma-hnswlib==0.7.6
+chromadb==0.5.23
+click==8.1.8
+coloredlogs==15.0.1
+dataclasses-json==0.6.7
+Deprecated==1.2.15
+distro==1.9.0
+durationpy==0.9
+exceptiongroup==1.2.2
+fastapi==0.115.6
+filelock==3.16.1
+flatbuffers==24.12.23
+frozenlist==1.5.0
+fsspec==2024.12.0
+google-auth==2.37.0
+googleapis-common-protos==1.66.0
+greenlet==3.1.1
+grpcio==1.69.0
+h11==0.14.0
+httpcore==1.0.7
+httptools==0.6.4
+httpx==0.28.1
+httpx-sse==0.4.0
+huggingface-hub==0.27.1
+humanfriendly==10.0
+idna==3.10
+importlib_metadata==8.5.0
+importlib_resources==6.5.2
+jiter==0.8.2
+jsonpatch==1.33
+jsonpointer==3.0.0
+kubernetes==31.0.0
+langchain==0.3.14
+langchain-chroma==0.1.4
+langchain-community==0.3.14
+langchain-core==0.3.29
+langchain-openai==0.2.14
+langchain-text-splitters==0.3.4
+langsmith==0.2.10
+markdown-it-py==3.0.0
+marshmallow==3.24.1
+mdurl==0.1.2
+mmh3==5.0.1
+monotonic==1.6
+mpmath==1.3.0
+multidict==6.1.0
+mypy-extensions==1.0.0
+numpy==1.26.4
+oauthlib==3.2.2
+onnxruntime==1.20.1
+openai==1.59.3
+opentelemetry-api==1.29.0
+opentelemetry-exporter-otlp-proto-common==1.29.0
+opentelemetry-exporter-otlp-proto-grpc==1.29.0
+opentelemetry-instrumentation==0.50b0
+opentelemetry-instrumentation-asgi==0.50b0
+opentelemetry-instrumentation-fastapi==0.50b0
+opentelemetry-proto==1.29.0
+opentelemetry-sdk==1.29.0
+opentelemetry-semantic-conventions==0.50b0
+opentelemetry-util-http==0.50b0
+orjson==3.10.13
+overrides==7.7.0
+packaging==24.2
+posthog==3.7.5
+propcache==0.2.1
+protobuf==5.29.2
+pyasn1==0.6.1
+pyasn1_modules==0.4.1
+pydantic==2.10.4
+pydantic-settings==2.7.1
+pydantic_core==2.27.2
+Pygments==2.19.1
+PyPika==0.48.9
+pyproject_hooks==1.2.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.0.1
+PyYAML==6.0.2
+regex==2024.11.6
+requests==2.32.3
+requests-oauthlib==2.0.0
+requests-toolbelt==1.0.0
+rich==13.9.4
+rsa==4.9
+shellingham==1.5.4
+six==1.17.0
+sniffio==1.3.1
+SQLAlchemy==2.0.36
+starlette==0.41.3
+sympy==1.13.3
+tenacity==9.0.0
+tiktoken==0.8.0
+tokenizers==0.20.3
+tomli==2.2.1
+tqdm==4.67.1
+typer==0.15.1
+typing-inspect==0.9.0
+typing_extensions==4.12.2
+urllib3==2.3.0
+uvicorn==0.34.0
+uvloop==0.21.0
+watchfiles==1.0.3
+websocket-client==1.8.0
+websockets==14.1
+wrapt==1.17.0
+yarl==1.18.3
+zipp==3.21.0
+
+-----------------------------------------------------------
+[Container: quant_service] pip freeze
+-----------------------------------------------------------
+annotated-types==0.7.0
+anyio==4.8.0
+certifi==2024.12.14
+charset-normalizer==3.4.1
+click==8.1.8
+distro==1.9.0
+exceptiongroup==1.2.2
+fastapi==0.115.6
+h11==0.14.0
+httpcore==1.0.7
+httpx==0.28.1
+idna==3.10
+jiter==0.8.2
+openai==1.59.3
+pydantic==2.10.4
+pydantic_core==2.27.2
+python-dotenv==1.0.1
+requests==2.32.3
+sniffio==1.3.1
+starlette==0.41.3
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.3.0
+uvicorn==0.34.0
+
+-----------------------------------------------------------
+[Container: ragchain_service] pip freeze
+-----------------------------------------------------------
+[INFO] Could not run pip freeze in container ragchain_service.
+
+-----------------------------------------------------------
+[Container: qmcs-solana_agents] pip freeze
+-----------------------------------------------------------
+OCI runtime exec failed: exec failed: unable to start container process: exec: "pip": executable file not found in $PATH: unknown
+[INFO] Could not run pip freeze in container qmcs-solana_agents.
+===============================================
+[6/6] Summarize Known Issues from Logs
+===============================================
+
+[GREP for 'ModuleNotFoundError' or 'No module named']
+ (No direct 'ModuleNotFoundError' found in this log).
+
+[GREP for 'ERROR' lines (case-insensitive)]
+ (No 'ERROR' lines found).
+
+[HINT] If you see something like 'No module named X', you can fix it by installing it in your Dockerfile/requirements.

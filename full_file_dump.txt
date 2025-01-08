@@ -1,0 +1,744 @@
+===== Starting cat_all_files.sh script =====
+Tue Jan  7 00:27:21 EST 2025
+
+[STEP] Dumping key container-based files...
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/main.py
+Error response from daemon: Container 9c5ab0422ecd8d9c5ba09db816cd0a80a466b2b529b478a4d85bf640f870812b is restarting, wait until the container is running
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/requirements.txt
+Error response from daemon: Container 9c5ab0422ecd8d9c5ba09db816cd0a80a466b2b529b478a4d85bf640f870812b is restarting, wait until the container is running
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/main.py
+import os
+import openai
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import uvicorn
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.docstore.document import Document
+import asyncio
+from datetime import datetime
+
+load_dotenv()
+app = FastAPI(
+    title="OpenAI Service w/ Advanced Memory",
+    description="Stores doc embeddings, uses openai.chat.completions, returns health checks.",
+    version="1.0.0",
+)
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def choose_model_based_on_complexity(prompt: str) -> str:
+    # Simple logic - adapt as needed
+    if "complex" in prompt.lower() or "reasoning" in prompt.lower():
+        return "gpt-4o"
+    elif "code" in prompt.lower():
+        return "gpt-4o"
+    else:
+        return "gpt-3.5-turbo"
+
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+
+class AddDocRequest(BaseModel):
+    text: str
+    chunk_size: int = 200
+    chunk_overlap: int = 20
+
+class AskRequest(BaseModel):
+    query: str
+    k: Optional[int] = 3
+
+@app.post("/add_doc")
+async def add_doc(req: AddDocRequest):
+    try:
+        splitter = CharacterTextSplitter(
+            separator=" ",
+            chunk_size=req.chunk_size,
+            chunk_overlap=req.chunk_overlap
+        )
+        chunks = splitter.split_text(req.text)
+        docs = [Document(page_content=chunk) for chunk in chunks]
+        vectorstore.add_documents(docs)
+        return {"message": f"Stored {len(chunks)} chunks.", "chunks": chunks}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ask")
+async def ask(req: AskRequest):
+    try:
+        relevant_docs = vectorstore.similarity_search(req.query, k=req.k or 3)
+        combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+
+        system_prompt = (
+            "You are an AI assistant with knowledge from these docs:\n"
+            f"{combined_text}\n\n"
+            "Answer based on these docs. If not found, say unsure."
+        )
+        chosen_model = choose_model_based_on_complexity(req.query)
+        response = await openai.ChatCompletion.acreate(
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": req.query}
+            ],
+            temperature=0.7,
+        )
+        if response.choices[0].message is None:
+            return {"answer": None, "chosen_model": chosen_model}
+        answer = response.choices[0].message.content.strip()
+        return {"answer": answer, "chosen_model": chosen_model}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/models")
+async def list_models():
+    return {
+        "data": [
+            {"id": "gpt-4o"},
+            {"id": "gpt-3.5-turbo"},
+            {"id": "o1"},
+            {"id": "o1-mini"}
+        ]
+    }
+
+@app.post("/chat")
+async def chat_endpoint(payload: Dict):
+    try:
+        user_message = payload.get("messages", [{"role": "user","content":""}])[-1]["content"]
+        chosen_model = choose_model_based_on_complexity(user_message)
+        response = await openai.ChatCompletion.acreate(
+            model=chosen_model,
+            messages=[{"role": "user", "content": user_message}],
+            temperature=0.7,
+        )
+        if response.choices[0].message is None:
+            return {"model_used": chosen_model, "answer": None}
+        answer = response.choices[0].message.content.strip()
+        return {"model_used": chosen_model, "answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/requirements.txt
+# For advanced memory with LangChain + Chroma:
+langchain>=0.0.200
+langchain-chroma>=0.0.2
+langchain-openai>=0.0.7
+langchain-community>=0.0.4
+
+# The latest OpenAI library (1.0+):
+openai>=1.0.0
+
+# Basic Python + FastAPI + etc
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/main.py
+import psutil
+import os
+import httpx
+import traceback
+from fastapi import FastAPI
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 'healthy' to match VOTS expectations
+    return {"status": "healthy", "service": "argus_service"}
+
+@app.get("/metrics")
+async def get_metrics():
+    mem = psutil.virtual_memory()
+    cpu_percent = psutil.cpu_percent(interval=1)
+    return {
+        "cpu_usage": cpu_percent,
+        "memory_usage": f"{mem.percent:.2f}%"
+    }
+
+@app.get("/test_solana_agents")
+async def check_solana_health():
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get("http://solana_agents:5106/health", timeout=5)
+        if resp.status_code == 200:
+            return resp.json()
+        else:
+            return {"status": "error","message":"No response from solana_agents service"}
+    except Exception as e:
+        traceback.print_exc()
+        return {"status":"error","message":str(e)}
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/main.py
+import os
+import requests
+import asyncio
+import traceback
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+@app.get("/health")
+async def health_check():
+    # Return 200 + "status: healthy" to align with typical checks
+    return {"status": "healthy","service":"oracle_service"}
+
+@app.get("/get_external_data")
+async def get_external_data():
+    """Placeholder for fetching external data from an external API."""
+    return {"message": "Endpoint for external data usage."}
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/main.py
+import os
+import requests
+import asyncio
+import traceback
+import openai
+import time
+import random
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv()
+app = FastAPI()
+
+SOLANA_AGENTS_URL = os.getenv("SOLANA_AGENTS_URL","http://solana_agents:5106")
+RAGCHAIN_SERVICE_URL= os.getenv("RAGCHAIN_SERVICE_URL","http://ragchain_service:5105")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+QUANT_SERVICE_URL= os.getenv("QUANT_SERVICE_URL","http://quant_service:5104")
+
+developer_wallet_count = 0
+volume = 0
+launch_start_time = time.time()
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service":"quant_service"}
+
+@app.get("/test_redis")
+def test_redis():
+    # If you do not have Redis integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.get("/test_mongo")
+def test_mongo():
+    # If you do not have Mongo integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.post("/trade")
+async def do_trade(data: dict):
+    try:
+        rag_response = await get_ragchain_ideas()
+        print("RAGChain response:", rag_response)
+        resp = await process_with_retry(
+            requests.post,
+            f"{SOLANA_AGENTS_URL}/trade",
+            json=data,
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.get("/pump-signals/{token}")
+async def get_pump_signals(token: str):
+    global developer_wallet_count, volume, launch_start_time
+    developer_wallet_count += random.randint(0,5)
+    volume += random.randint(10,200)
+    time_since_start = time.time() - launch_start_time
+    hype_score = (developer_wallet_count * 0.3) + (volume * 0.2) + (time_since_start*0.1)
+    return {
+        "dev_whale_activity": developer_wallet_count,
+        "social_score": hype_score,
+        "volume_score": volume
+    }
+
+@app.get("/get-ragchain-ideas")
+async def get_ragchain_ideas():
+    try:
+        resp = await process_with_retry(
+            requests.get,
+            f"{RAGCHAIN_SERVICE_URL}/ephemeral_ideas",
+            timeout=10
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)})
+
+@app.post("/decide")
+async def make_decision(context: dict):
+    try:
+        pump_signals = await process_with_retry(
+            requests.get,
+            f"{QUANT_SERVICE_URL}/pump-signals/SOL",
+            timeout=10
+        )
+        pump_signals.raise_for_status()
+        # Minimal usage of openai
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        openai_response = await process_with_retry(
+            client.chat.completions.create,
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"user","content":f"Generate a quick decision on: {pump_signals.text}"}
+            ],
+            temperature=0.7,
+        )
+        ans = openai_response.choices[0].message.content
+        return {"execute":True, "reason":"Testing", "openai_response":ans}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def process_with_retry(call, url: str, *args, **kwargs):
+    for attempt in range(3):
+        try:
+            response = await asyncio.wait_for(call(url, *args, **kwargs), timeout=10)
+            response.raise_for_status()
+            return response
+        except Exception as e:
+            if attempt==2:
+                raise
+            await asyncio.sleep(2**attempt)
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/requirements.txt
+openai>=1.0.0
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [docker] : /app/index.js
+require('dotenv').config();
+const axios = require('axios');
+const cron = require('node-cron');
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+const {
+  Connection,
+  Keypair,
+  Transaction,
+  SystemProgram,
+  sendAndConfirmTransaction,
+  PublicKey
+} = require("@solana/web3.js");
+
+const { v4: uuidv4 } = require('uuid');
+
+const logger = {
+  info: (...args) => console.log(new Date().toISOString(), "[INFO]", ...args),
+  error: (...args) => console.error(new Date().toISOString(), "[ERROR]", ...args),
+  warn: (...args) => console.warn(new Date().toISOString(), "[WARN]", ...args),
+};
+
+const PORT = process.env.PORT || 4000;
+const RAGCHAIN_SERVICE_URL = process.env.RAGCHAIN_SERVICE_URL;
+const QUANT_SERVICE_URL = process.env.QUANT_SERVICE_URL;
+const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL;
+const SOLANA_PRIVATE_KEY = process.env.SOLANA_PRIVATE_KEY;
+const TWITTER_USERNAME = process.env.TWITTER_USERNAME;
+const TWITTER_PASSWORD = process.env.TWITTER_PASSWORD;
+const TWITTER_EMAIL = process.env.TWITTER_EMAIL;
+
+logger.info("Starting solana_agents with config:", {
+  PORT, QUANT_SERVICE_URL, SOLANA_RPC_URL
+});
+
+/**
+ * For now, we remove all references to 'agent-twitter-client' and simply omit any tweet scraping logic.
+ * If you want to re-implement Twitter functionality with a different library, you can add it here later.
+ */
+
+app.get('/health', (req, res) => {
+  res.status(200).send({ status: "ok", publicKey: process.env.SOLANA_PUBLIC_KEY });
+});
+
+async function processTransaction(token, amount) {
+  if (!SOLANA_PRIVATE_KEY) {
+    throw new Error('Missing SOLANA_PRIVATE_KEY');
+  }
+
+  const connection = new Connection(SOLANA_RPC_URL);
+  const keypair = Keypair.fromSecretKey(
+    Uint8Array.from(Buffer.from(SOLANA_PRIVATE_KEY, 'base64'))
+  );
+  const toPublicKey = new PublicKey(process.env.SOLANA_PUBLIC_KEY);
+  const lamports = amount * 1000000000;
+
+  // Create a transaction to transfer lamports
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: keypair.publicKey,
+      toPubkey: toPublicKey,
+      lamports: lamports,
+    })
+  );
+
+  logger.info('Attempting to send lamports to ', toPublicKey);
+
+  try {
+    const signature = await sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [keypair]
+    );
+    logger.info('Solana Transaction successful:', signature);
+    return { success: true, signature: signature };
+  } catch (e) {
+    logger.error('Solana Transaction failed:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+// Example CRON: daily tasks at midnight
+cron.schedule('0 0 * * *', async () => {
+  logger.info('Running daily tasks...');
+  // Example call to quant_service
+  try {
+    const response = await axios.get(`${QUANT_SERVICE_URL}/health`);
+    console.log('Response from quant_service:', response.data);
+  } catch (error) {
+    console.error('Error contacting quant service:', error);
+  }
+});
+
+// (We remove the tweet scraping function since agent-twitter-client is no longer used.)
+
+app.post('/trade', async (req, res) => {
+  const data = req.body;
+  logger.info("Received trade request: ", data);
+
+  // Instead of scraping tweets, we do no extra step here
+  const result = await processTransaction("SOL", 0.1);
+  res.status(200).send({
+    message: "Trading logic is a placeholder (agent-twitter-client removed).",
+    solana: result
+  });
+});
+
+app.listen(PORT, () => {
+  logger.info(`solana_agents listening on port ${PORT}`);
+});
+------------------------------------------------------------
+
+[STEP] Dumping local files...
+------------------------------------------------------------
+[INFO] Attempting to cat [local] : ragchain_service/main.py
+import os
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from tenacity import retry, stop_after_attempt, wait_fixed
+import asyncio
+from datetime import datetime
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_text_splitters import CharacterTextSplitter
+from langchain_core.documents import Document
+import openai
+import uvicorn
+import logging
+from fastapi import FastAPI
+import google.generativeai as genai
+
+load_dotenv()
+app = FastAPI()
+
+MONGO_URL = os.getenv("MONGO_URL","mongodb://mongo:27017")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+db_client = None
+ephemeral_thoughts = []
+
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Model options: "gemini-pro", "gemini-ultra" (if available)
+gemini_model = genai.GenerativeModel('gemini-pro')
+
+
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+
+@retry(stop=stop_after_attempt(5), wait=wait_fixed(2))
+async def connect_to_mongo():
+    global db_client
+    db_client = AsyncIOMotorClient(MONGO_URL)
+    result = await db_client.admin.command("ping")
+    logging.info(f"[ragchain_service] ping: {result}")
+
+@app.on_event("startup")
+async def startup_event():
+    await connect_to_mongo()
+    logging.info("[ragchain_service] Connected to Mongo (async).")
+
+@app.get("/")
+async def root():
+    return {"status":"ragchain_service running"}
+
+@app.get("/health")
+async def health():
+    return {"status":"ok", "service":"ragchain_service"}
+
+@app.post("/store_thought/")
+async def store_thought(thought: str):
+    global ephemeral_thoughts
+    ephemeral_thoughts.append({
+        "id": len(ephemeral_thoughts),
+        "text": thought,
+        "time": str(datetime.now())
+    })
+    return {"message":"Stored Ephemeral Thought"}
+
+@app.get("/ephemeral_ideas")
+async def get_ephemeral_ideas():
+    return {"data": ephemeral_thoughts}
+
+@app.post("/add_doc")
+async def add_doc(text: str, chunk_size: int=200, chunk_overlap: int=20):
+    splitter = CharacterTextSplitter(
+        separator=" ",
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap
+    )
+    chunks = splitter.split_text(text)
+    docs = [Document(page_content=chunk) for chunk in chunks]
+    vectorstore.add_documents(docs)
+    return {"message":"Stored Documents", "chunks": chunks}
+
+@app.post("/ask")
+async def ask(query: str, k: int=3, use_gemini: bool = False):
+    try:
+      if use_gemini:
+          response = gemini_model.generate_content(query)
+          ans = response.text
+          return {"answer": ans, "docsUsed":[]} # No document context with Gemini for now.
+      else:
+        relevant_docs = vectorstore.similarity_search(query, k=k or 3)
+        combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+        prompt = (
+            "You are an AI with knowledge from docs:\n"
+            f"{combined_text}\n\n"
+            "Answer user question. If not found, say 'unsure'."
+        )
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"system","content":prompt},
+                {"role":"user","content":query}
+            ],
+            temperature=0.7
+        )
+        ans = response.choices[0].message.content.strip() if response.choices[0].message else None
+        return {"answer": ans, "docsUsed":[d.page_content for d in relevant_docs]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [local] : ragchain_service/requirements.txt
+fastapi==0.109.2
+uvicorn
+openai>=1.0.0
+python-dotenv>=1.0.0
+chromadb
+google-generativeai
+motor
+tenacity
+requests
+pydantic
+httpx
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [local] : openai_service/main.py
+import os
+from dotenv import load_dotenv
+from typing import Optional, List, Dict
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import uvicorn
+from langchain.vectorstores import Chroma
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.docstore.document import Document
+import asyncio
+from datetime import datetime
+
+load_dotenv()
+app = FastAPI(
+    title="OpenAI Service w/ Advanced Memory",
+    version="1.0.0",
+)
+
+
+def choose_model_based_on_complexity(prompt: str) -> str:
+    # Simple logic - adapt as needed
+    if "complex" in prompt.lower() or "reasoning" in prompt.lower():
+        return "gpt-4o"
+    elif "code" in prompt.lower():
+        return "gpt-4o"
+    else:
+        return "gpt-3.5-turbo"
+
+embeddings = OpenAIEmbeddings(disallowed_special=())
+vectorstore = Chroma(
+    collection_name="my_longterm_memory",
+    embedding_function=embeddings,
+    persist_directory="/app/chroma_storage"
+)
+
+class AddDocRequest(BaseModel):
+    text: str
+    chunk_size: int = 200
+    chunk_overlap: int = 20
+
+class AskRequest(BaseModel):
+    query: str
+    k: Optional[int] = 3
+
+@app.post("/add_doc")
+async def add_doc(req: AddDocRequest):
+    try:
+        splitter = CharacterTextSplitter(
+            separator=" ",
+            chunk_size=req.chunk_size,
+            chunk_overlap=req.chunk_overlap
+        )
+        chunks = splitter.split_text(req.text)
+        docs = [Document(page_content=chunk) for chunk in chunks]
+        vectorstore.add_documents(docs)
+        return {"message": f"Stored {len(chunks)} chunks.", "chunks": chunks}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/ask")
+async def ask(req: AskRequest):
+    try:
+        relevant_docs = vectorstore.similarity_search(req.query, k=req.k or 3)
+        combined_text = "\n".join([doc.page_content for doc in relevant_docs])
+
+        system_prompt = (
+            "You are an AI assistant with knowledge from these docs:\n"
+            f"{combined_text}\n\n"
+            "Answer based on these docs. If not found, say unsure."
+        )
+        chosen_model = choose_model_based_on_complexity(req.query)
+            model=chosen_model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": req.query}
+            ],
+            temperature=0.7,
+        )
+        if response.choices[0].message is None:
+            return {"answer": None, "chosen_model": chosen_model}
+        answer = response.choices[0].message.content.strip()
+        return {"answer": answer, "chosen_model": chosen_model}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/models")
+async def list_models():
+    return {
+        "data": [
+            {"id": "gpt-4o"},
+            {"id": "gpt-3.5-turbo"},
+            {"id": "o1"},
+            {"id": "o1-mini"}
+        ]
+    }
+
+@app.post("/chat")
+async def chat_endpoint(payload: Dict):
+    try:
+        user_message = payload.get("messages", [{"role": "user","content":""}])[-1]["content"]
+        chosen_model = choose_model_based_on_complexity(user_message)
+            model=chosen_model,
+            messages=[{"role": "user", "content": user_message}],
+            temperature=0.7,
+        )
+        if response.choices[0].message is None:
+            return {"model_used": chosen_model, "answer": None}
+        answer = response.choices[0].message.content.strip()
+        return {"model_used": chosen_model, "answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+import openai
+------------------------------------------------------------
+
+------------------------------------------------------------
+[INFO] Attempting to cat [local] : openai_service/requirements.txt
+# For advanced memory with LangChain + Chroma:
+langchain>=0.0.200
+langchain-chroma>=0.0.2
+langchain-openai>=0.0.7
+langchain-community>=0.0.4
+
+# The latest OpenAI library (1.0+):
+openai>=1.0.0
+
+# Basic Python + FastAPI + etc
+python-dotenv>=1.0.0
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+------------------------------------------------------------
+
+[DONE] File dump complete. See full_file_dump.txt for full results.

@@ -1,0 +1,260 @@
+2025-01-07 23:42:38,964 - INFO - 
+==================================================
+2025-01-07 23:42:38,980 - INFO - Testing prompt: Tell me a short story about a programmer.
+2025-01-07 23:42:38,981 - INFO - Sending prompt: Tell me a short story about a programmer....
+2025-01-07 23:42:40,210 - INFO - Function call: generate_file
+2025-01-07 23:42:40,210 - INFO - Arguments: <proto.marshal.collections.maps.MapComposite object at 0x7e2481c95670>
+2025-01-07 23:42:40,211 - INFO - Duration: 1.23s
+2025-01-07 23:42:42,211 - INFO - 
+==================================================
+2025-01-07 23:42:42,211 - INFO - Testing prompt: Generate a Python file that implements a simple calculator.
+2025-01-07 23:42:42,212 - INFO - Sending prompt: Generate a Python file that implements a simple calculator....
+2025-01-07 23:42:44,037 - INFO - Function call: generate_file
+2025-01-07 23:42:44,037 - INFO - Arguments: <proto.marshal.collections.maps.MapComposite object at 0x7e2481c95bb0>
+2025-01-07 23:42:44,038 - INFO - Duration: 1.82s
+2025-01-07 23:42:46,038 - INFO - 
+==================================================
+2025-01-07 23:42:46,038 - INFO - Testing prompt: Review this code: def add(x,y): return x+y
+2025-01-07 23:42:46,039 - INFO - Sending prompt: Review this code: def add(x,y): return x+y...
+2025-01-07 23:42:47,118 - INFO - Function call: review_code
+2025-01-07 23:42:47,119 - INFO - Arguments: <proto.marshal.collections.maps.MapComposite object at 0x7e2481c95d30>
+2025-01-07 23:42:47,119 - INFO - Duration: 1.08s
+2025-01-07 23:43:47,072 - INFO - 
+==================================================
+2025-01-07 23:43:47,073 - INFO - Testing prompt: Tell me a short story about a programmer.
+2025-01-07 23:43:47,073 - INFO - Sending prompt: Tell me a short story about a programmer....
+2025-01-07 23:43:48,284 - INFO - Generating file story.py
+2025-01-07 23:43:48,285 - INFO - Function call: generate_file
+2025-01-07 23:43:48,285 - INFO - Arguments: {'content': "print('Once upon a time there was a programmer named Alice.')", 'filename': 'story.py'}
+2025-01-07 23:43:48,285 - INFO - Result: print('Once upon a time there was a programmer named Alice.')
+2025-01-07 23:43:48,285 - INFO - Duration: 1.21s
+2025-01-07 23:43:50,285 - INFO - 
+==================================================
+2025-01-07 23:43:50,286 - INFO - Testing prompt: Generate a Python file that implements a simple calculator.
+2025-01-07 23:43:50,286 - INFO - Sending prompt: Generate a Python file that implements a simple calculator....
+2025-01-07 23:43:52,019 - INFO - Generating file calculator.py
+2025-01-07 23:43:52,021 - INFO - Function call: generate_file
+2025-01-07 23:43:52,021 - INFO - Arguments: {'content': 'def add(a, b):\n  return a + b\n\ndef subtract(a, b):\n  return a - b\n\ndef multiply(a, b):\n  return a * b\n\ndef divide(a, b):\n  return a / b\n', 'filename': 'calculator.py'}
+2025-01-07 23:43:52,021 - INFO - Result: def add(a, b):
+  return a + b
+
+def subtract(a, b):
+  return a - b
+
+def multiply(a, b):
+  return a * b
+
+def divide(a, b):
+  return a / b
+
+2025-01-07 23:43:52,021 - INFO - Duration: 1.73s
+2025-01-07 23:43:54,063 - INFO - 
+==================================================
+2025-01-07 23:43:54,063 - INFO - Testing prompt: Review this code: def add(x,y): return x+y
+2025-01-07 23:43:54,064 - INFO - Sending prompt: Review this code: def add(x,y): return x+y...
+2025-01-07 23:43:55,157 - INFO - Reviewing code: def add(x,y): return x+y
+2025-01-07 23:43:55,157 - INFO - Function call: review_code
+2025-01-07 23:43:55,157 - INFO - Arguments: {'code': 'def add(x,y): return x+y'}
+2025-01-07 23:43:55,158 - INFO - Result: Code review for: def add(x,y): return x+y
+2025-01-07 23:43:55,158 - INFO - Duration: 1.09s
+2025-01-07 23:45:41,072 - INFO - 
+==================================================
+2025-01-07 23:45:41,072 - INFO - Test 1/3: Tell me a short story about a programmer.
+2025-01-07 23:45:41,072 - INFO - Processing prompt: Tell me a short story about a programmer....
+2025-01-07 23:45:42,302 - INFO - Generating file: story.py
+2025-01-07 23:45:42,302 - INFO - Function: generate_file
+2025-01-07 23:45:42,302 - INFO - Arguments: {'content': "print('Once upon a time, there was a programmer named Alice.')", 'filename': 'story.py'}
+2025-01-07 23:45:42,302 - INFO - Result: Generated story.py with content:
+print('Once upon a time, there was a programmer named Alice.')
+2025-01-07 23:45:42,302 - INFO - Duration: 1.23s
+2025-01-07 23:45:44,304 - INFO - 
+==================================================
+2025-01-07 23:45:44,304 - INFO - Test 2/3: Generate a Python file that implements a simple calculator.
+2025-01-07 23:45:44,304 - INFO - Processing prompt: Generate a Python file that implements a simple calculator....
+2025-01-07 23:45:46,039 - INFO - Generating file: calculator.py
+2025-01-07 23:45:46,040 - INFO - Function: generate_file
+2025-01-07 23:45:46,040 - INFO - Arguments: {'content': 'def add(a, b):\n  return a + b\n\ndef subtract(a, b):\n  return a - b\n\ndef multiply(a, b):\n  return a * b\n\ndef divide(a, b):\n  return a / b\n', 'filename': 'calculator.py'}
+2025-01-07 23:45:46,040 - INFO - Result: Generated calculator.py with content:
+def add(a, b):
+  return a + b
+
+def subtract(a, b):
+  return a - b
+
+def multiply(a, b):
+  return a * b
+
+def divide(a, b):
+  return a / b
+
+2025-01-07 23:45:46,040 - INFO - Duration: 4.97s
+2025-01-07 23:45:48,049 - INFO - 
+==================================================
+2025-01-07 23:45:48,051 - INFO - Test 3/3: Review this code: def add(x,y): return x+y
+2025-01-07 23:45:48,051 - INFO - Processing prompt: Review this code: def add(x,y): return x+y...
+2025-01-07 23:45:49,165 - INFO - Reviewing code: def add(x,y): return x+y
+2025-01-07 23:45:49,166 - INFO - Function: review_code
+2025-01-07 23:45:49,166 - INFO - Arguments: {'code': 'def add(x,y): return x+y'}
+2025-01-07 23:45:49,166 - INFO - Result: Code review for: def add(x,y): return x+y
+2025-01-07 23:45:49,167 - INFO - Duration: 8.09s
+2025-01-07 23:47:06,927 - INFO - 
+==================================================
+2025-01-07 23:47:06,927 - INFO - Test 1/3: Tell me a short story about a programmer.
+2025-01-07 23:47:06,927 - INFO - Processing prompt: Tell me a short story about a programmer....
+2025-01-07 23:47:08,093 - INFO - Generating file: story.py
+2025-01-07 23:47:08,093 - INFO - Function: generate_file
+2025-01-07 23:47:08,093 - INFO - Arguments: {'content': "print('Once upon a time there was a programmer...')", 'filename': 'story.py'}
+2025-01-07 23:47:08,093 - INFO - Result: Successfully generated story.py with formatted content:
+
+print('Once upon a time there was a programmer...')
+2025-01-07 23:47:08,093 - INFO - Duration: 1.17s
+2025-01-07 23:47:10,096 - INFO - 
+==================================================
+2025-01-07 23:47:10,096 - INFO - Test 2/3: Generate a Python file that implements a simple calculator.
+2025-01-07 23:47:10,096 - INFO - Processing prompt: Generate a Python file that implements a simple calculator....
+2025-01-07 23:47:11,797 - INFO - Generating file: calculator.py
+2025-01-07 23:47:11,798 - INFO - Function: generate_file
+2025-01-07 23:47:11,798 - INFO - Arguments: {'content': 'def add(a, b):\n  return a + b\n\ndef subtract(a, b):\n  return a - b\n\ndef multiply(a, b):\n  return a * b\n\ndef divide(a, b):\n  return a / b\n', 'filename': 'calculator.py'}
+2025-01-07 23:47:11,798 - INFO - Result: Successfully generated calculator.py with formatted content:
+
+def add(a, b):
+    return a + b
+
+
+def subtract(a, b):
+    return a - b
+
+
+def multiply(a, b):
+    return a * b
+
+
+def divide(a, b):
+    return a / b
+
+2025-01-07 23:47:11,799 - INFO - Duration: 4.87s
+2025-01-07 23:47:13,801 - INFO - 
+==================================================
+2025-01-07 23:47:13,802 - INFO - Test 3/3: Review this code: def add(x,y): return x+y
+2025-01-07 23:47:13,803 - INFO - Processing prompt: Review this code: def add(x,y): return x+y...
+2025-01-07 23:47:14,870 - INFO - Reviewing code: def add(x,y): return x+y
+2025-01-07 23:47:14,871 - INFO - Function: review_code
+2025-01-07 23:47:14,872 - INFO - Arguments: {'code': 'def add(x,y): return x+y'}
+2025-01-07 23:47:14,872 - INFO - Result: Code Review:
+- Add spaces around operators for better readability (e.g., 'x + y' instead of 'x+y')
+- Add space after commas in parameter lists
+- Add a docstring to document the function's purpose and parameters
+
+Suggested improved version:
+
+def add(x:
+    """Add two numbers and return their sum."""
+    float, y: float) -> float:x, y): return x + y
+2025-01-07 23:47:14,873 - INFO - Duration: 7.94s
+2025-01-07 23:50:26,000 - INFO - 
+==================================================
+Test 1/3: Hi, please tell me a short story about a wise developer
+2025-01-07 23:50:26,001 - INFO - [call_gemini] Prompt (truncated): Hi, please tell me a short story about a wise developer...
+2025-01-07 23:50:28,342 - WARNING - [call_gemini] Attempt 1 failed: 500 An internal error has occurred. Please retry or report in https://developers.generativeai.google/guide/troubleshooting
+2025-01-07 23:50:28,344 - INFO - Retrying in 2.0 seconds...
+2025-01-07 23:50:32,621 - WARNING - [call_gemini] Attempt 2 failed: 500 An internal error has occurred. Please retry or report in https://developers.generativeai.google/guide/troubleshooting
+2025-01-07 23:50:32,621 - INFO - Retrying in 4.0 seconds...
+2025-01-07 23:50:38,909 - WARNING - [call_gemini] Attempt 3 failed: 500 An internal error has occurred. Please retry or report in https://developers.generativeai.google/guide/troubleshooting
+2025-01-07 23:50:38,909 - ERROR - [ERROR] All attempts failed: 500 An internal error has occurred. Please retry or report in https://developers.generativeai.google/guide/troubleshooting
+2025-01-07 23:50:38,909 - INFO - Duration: 12.91s
+
+2025-01-07 23:50:39,910 - INFO - 
+==================================================
+Test 2/3: generate_file filename='calc.py' content='def add(x,y):return x+y\ndef sub(x,y):return x-y'
+2025-01-07 23:50:39,911 - INFO - [call_gemini] Prompt (truncated): generate_file filename='calc.py' content='def add(x,y):return x+y\ndef sub(x,y):...
+2025-01-07 23:50:41,191 - INFO - Function call request: generate_file with args: {'content': 'def add(x,y):return x+y\\ndef sub(x,y):return x-y', 'filename': 'calc.py'}
+2025-01-07 23:50:41,191 - INFO - Generating file: calc.py
+2025-01-07 23:50:41,191 - INFO - Function Called: generate_file
+2025-01-07 23:50:41,192 - INFO - Arguments: {'content': 'def add(x,y):return x+y\\ndef sub(x,y):return x-y', 'filename': 'calc.py'}
+2025-01-07 23:50:41,192 - INFO - Result:
+Successfully generated calc.py:
+
+def add(x,y):return x+y\ndef sub(x,y):return x-y
+2025-01-07 23:50:41,192 - INFO - Duration: 15.19s
+
+2025-01-07 23:50:42,193 - INFO - 
+==================================================
+Test 3/3: review_code code='def multiply(x,y):return x*y'
+2025-01-07 23:50:42,193 - INFO - [call_gemini] Prompt (truncated): review_code code='def multiply(x,y):return x*y'...
+2025-01-07 23:50:43,316 - INFO - Function call request: review_code with args: {'code': 'def multiply(x,y):return x*y'}
+2025-01-07 23:50:43,317 - INFO - Reviewing code snippet...
+2025-01-07 23:50:43,317 - INFO - Function Called: review_code
+2025-01-07 23:50:43,317 - INFO - Arguments: {'code': 'def multiply(x,y):return x*y'}
+2025-01-07 23:50:43,317 - INFO - Result:
+Code Review:
+- Consider adding spaces around operators and commas for clarity
+- Consider adding a docstring to describe the function's purpose
+
+Suggested improved version:
+def multiply(x, y):
+    """TODO: describe what this function does"""return x*y
+2025-01-07 23:50:43,317 - INFO - Duration: 17.32s
+
+2025-01-07 23:54:06,546 - INFO - 
+==================================================
+2025-01-07 23:54:06,546 - INFO - Test 1/3: Hi, please tell me a short story about a wise developer
+2025-01-07 23:54:06,546 - INFO - [call_gemini] Prompt (truncated): Hi, please tell me a short story about a wise developer...
+2025-01-07 23:54:06,546 - INFO - [call_gemini] Prompt (truncated): Hi, please tell me a short story about a wise developer...
+2025-01-07 23:54:09,895 - WARNING - [call_gemini] Attempt 1 failed: 500 An internal error has occurred. Please retry or report in https://developers.generativeai.google/guide/troubleshooting
+2025-01-07 23:54:11,897 - INFO - Duration: 5.35s
+2025-01-07 23:54:11,897 - INFO - 
+==================================================
+2025-01-07 23:54:11,898 - INFO - Test 2/3: generate_file filename='calc.py' content='def add(x,y):retur
+2025-01-07 23:54:11,898 - INFO - [call_gemini] Prompt (truncated): generate_file filename='calc.py' content='def add(x,y):return x+y\ndef sub(x,y):return x-y'...
+2025-01-07 23:54:11,898 - INFO - [call_gemini] Prompt (truncated): generate_file filename='calc.py' content='def add(x,y):return x+y\ndef sub(x,y):return x-y'...
+2025-01-07 23:54:13,208 - WARNING - [call_gemini] Attempt 1 failed: whichOneof
+2025-01-07 23:54:15,211 - INFO - Duration: 3.31s
+2025-01-07 23:54:15,211 - INFO - 
+==================================================
+2025-01-07 23:54:15,212 - INFO - Test 3/3: review_code code='def multiply(x,y):return x*y'
+2025-01-07 23:54:15,212 - INFO - [call_gemini] Prompt (truncated): review_code code='def multiply(x,y):return x*y'...
+2025-01-07 23:54:15,212 - INFO - [call_gemini] Prompt (truncated): review_code code='def multiply(x,y):return x*y'...
+2025-01-07 23:54:16,308 - WARNING - [call_gemini] Attempt 1 failed: whichOneof
+2025-01-08 00:13:24,526 - INFO - 
+==================================================
+2025-01-08 00:13:24,526 - INFO - Test 1/3: Hi, please tell me a short story about a wise developer
+2025-01-08 00:13:24,526 - INFO - [call_gemini] (Attempt 1/3) Prompt: Hi, please tell me a short story about a wise developer...
+2025-01-08 00:13:24,526 - WARNING - [call_gemini] Attempt 1 failed: GenerativeModel.generate_content() got an unexpected keyword argument 'prompt'
+2025-01-08 00:13:24,526 - INFO - Retrying in 2 seconds...
+2025-01-08 00:13:26,529 - INFO - [call_gemini] (Attempt 2/3) Prompt: Hi, please tell me a short story about a wise developer...
+2025-01-08 00:13:26,529 - WARNING - [call_gemini] Attempt 2 failed: GenerativeModel.generate_content() got an unexpected keyword argument 'prompt'
+2025-01-08 00:13:26,529 - INFO - Retrying in 4 seconds...
+2025-01-08 00:13:30,533 - INFO - [call_gemini] (Attempt 3/3) Prompt: Hi, please tell me a short story about a wise developer...
+2025-01-08 00:13:30,533 - WARNING - [call_gemini] Attempt 3 failed: GenerativeModel.generate_content() got an unexpected keyword argument 'prompt'
+2025-01-08 00:13:30,533 - ERROR - [ERROR] All attempts failed: GenerativeModel.generate_content() got an unexpected keyword argument 'prompt'
+2025-01-08 00:13:30,533 - WARNING - [MAIN] No result returned or encountered errors.
+2025-01-08 00:13:30,534 - INFO - Duration: 6.01s
+
+2025-01-08 00:13:30,534 - INFO - 
+==================================================
+2025-01-08 00:13:30,534 - INFO - Test 2/3: generate_file filename='calc.py' content='def add(x,y):retur
+2025-01-08 00:13:30,534 - INFO - [call_gemini] (Attempt 1/3) Prompt: generate_file filename='calc.py' content='def add(x,y):return x+y\ndef sub(x,y):...
+2025-01-08 00:13:30,534 - WARNING - [call_gemini] Attempt 1 failed: GenerativeModel.generate_content() got an unexpected keyword argument 'prompt'
+2025-01-08 00:13:30,534 - INFO - Retrying in 2 seconds...
+2025-01-08 00:13:31,379 - INFO - Shutdown signal received, terminating.
+2025-01-08 00:32:13,815 - INFO - 
+==================================================
+2025-01-08 00:32:13,815 - INFO - Test 1/3 - Prompt:
+Please tell me a short story about a wise developer building a solution.
+2025-01-08 00:32:13,816 - WARNING - [call_gemini] Attempt 1 failed: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:13,816 - INFO - [call_gemini] Retrying in 2.0s...
+2025-01-08 00:32:15,819 - WARNING - [call_gemini] Attempt 2 failed: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:15,819 - INFO - [call_gemini] Retrying in 4.0s...
+2025-01-08 00:32:19,823 - WARNING - [call_gemini] Attempt 3 failed: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:19,823 - ERROR - All attempts failed after 3 tries. Last error: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:19,823 - WARNING - [main] No content returned from Gemini (or error).
+2025-01-08 00:32:19,826 - INFO - [main] Duration: 6.01s
+2025-01-08 00:32:19,826 - INFO - 
+==================================================
+2025-01-08 00:32:19,826 - INFO - Test 2/3 - Prompt:
+Generate_file filename='example.py' content='def hello():\n    print(\"Hello from generated file\")'
+2025-01-08 00:32:19,826 - WARNING - [call_gemini] Attempt 1 failed: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:19,826 - INFO - [call_gemini] Retrying in 2.0s...
+2025-01-08 00:32:21,829 - WARNING - [call_gemini] Attempt 2 failed: 'GenerativeModel' object has no attribute 'generate_text'
+2025-01-08 00:32:21,829 - INFO - [call_gemini] Retrying in 4.0s...
+2025-01-08 04:35:58,947 - INFO - [main] Shutdown signal received. Exiting.

@@ -1,0 +1,126 @@
+import os
+import requests
+import asyncio
+import traceback
+import openai
+import time
+import random
+from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+
+load_dotenv(
+app = FastAPI(
+
+SOLANA_AGENTS_URL = os.getenv("SOLANA_AGENTS_URL","http://solana_agents:5106"))
+RAGCHAIN_SERVICE_URL= os.getenv("RAGCHAIN_SERVICE_URL","http://ragchain_service:5105"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY"
+QUANT_SERVICE_URL= os.getenv("QUANT_SERVICE_URL","http://quant_service:5104"
+
+developer_wallet_count = 0
+volume = 0
+launch_start_time = time.time(
+
+@app.get("/health"
+async def health():
+    return {"status": "ok", "service":"quant_service"}
+
+@app.get("/test_redis"
+def test_redis():
+    # If you do not have Redis integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.get("/test_mongo"
+def test_mongo():
+    # If you do not have Mongo integration, either return 'ok' or code your logic
+    return "ok"
+
+@app.post("/trade"
+async def do_trade(data: dict):
+    try:
+        rag_response = await get_ragchain_ideas(
+        print("RAGChain response:", rag_response
+        resp = await process_with_retry(
+            requests.post,
+            f"{SOLANA_AGENTS_URL}/trade",
+            json=data,
+            timeout=10
+        resp.raise_for_status(
+        return resp.json(
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)}
+
+@app.get("/pump-signals/{token}"
+async def get_pump_signals(token: str):
+    global developer_wallet_count, volume, launch_start_time
+    developer_wallet_count += random.randint(0,5
+    volume += random.randint(10,200
+    time_since_start = time.time() - launch_start_time
+    hype_score = (developer_wallet_count * 0.3) + (volume * 0.2) + (time_since_start*0.1
+    return {
+        "dev_whale_activity": developer_wallet_count,
+        "social_score": hype_score,
+        "volume_score": volume
+
+@app.get("/get-ragchain-ideas"
+async def get_ragchain_ideas():
+    try:
+        resp = await process_with_retry(
+            requests.get,
+            f"{RAGCHAIN_SERVICE_URL}/ephemeral_ideas",
+            timeout=10
+        resp.raise_for_status(
+        return resp.json(
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message":"An error occurred","error":str(e)}
+
+@app.post("/decide"
+async def make_decision(context: dict):
+    try:
+        pump_signals = await process_with_retry(
+            requests.get,
+            f"{QUANT_SERVICE_URL}/pump-signals/SOL",
+            timeout=10
+        pump_signals.raise_for_status(
+        # Minimal usage of openai
+        client = openai.OpenAI(api_key=OPENAI_API_KEY
+        openai_response = await process_with_retry(
+            client.chat.completions.create,
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role":"user","content":f"Generate a quick decision on: {pump_signals.text}"}
+            ],
+            temperature=0.7,
+        ans = openai_response.choices[0].message.content
+        return {"execute":True, "reason":"Testing", "openai_response":ans}
+    except Exception as e:
+        traceback.print_exc(
+        raise HTTPException(status_code=500, detail=str(e
+
+async def process_with_retry(call, url: str, *args, **kwargs):
+    for attempt in range(3):
+        try:
+            response = await asyncio.wait_for(call(url, *args, **kwargs), timeout=10
+            response.raise_for_status(
+            return response
+        except Exception as e:
+            if attempt==2:
+                raise
+            await asyncio.sleep(2**attempt
+
+
+
+
+
+
+
+
+
+
+
+
+
+

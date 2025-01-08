@@ -1,0 +1,61 @@
+[INFO] Starting next-stage developer setup...
+[INFO] Checking quant_service/requirements.txt for quant_service
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[INFO] Checking ragchain_service/requirements.txt for ragchain_service
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[INFO] Checking openai_service/requirements.txt for openai_service
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[INFO] Checking argus_service/requirements.txt for argus_service
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[INFO] Checking oracle_service/requirements.txt for oracle_service
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[WARN] trilogy_app/requirements.txt not found for trilogy_app. Skipping.
+[INFO] Checking Node dependencies in solana_agents/package.json
+[SKIP] Not installing locally by default. (Edit script if needed.)
+[INFO] Found final_integration_steps.sh, offer to run it.
+[INFO] Running final_integration_steps.sh now...
+=======================================================
+      FINAL INTEGRATION & ENV SETUP STEPS
+=======================================================
+[1] ENVIRONMENT VARS & .env
+-------------------------------------------------------
+ - Check that your .env or environment variables (like MYSQL_PASSWORD, REDIS_PASSWORD, MONGO_DETAILS, etc.)
+   match the new advanced architecture.
+ - Confirm that Solana credentials (SOLANA_RPC_URL, SOLANA_PRIVATE_KEY, SOLANA_PUBLIC_KEY) are correct.
+ - Ensure all AI provider keys (OPENAI_API_KEY, GEMINI_API_KEY, etc.) are accurate.
+
+[2] DOCKER UPDATES & COMPOSE
+-------------------------------------------------------
+ - Update each Dockerfile if needed (especially solana_agents, openai_service, argus_service, ragchain_service,
+   quant_service) with the advanced code changes.
+ - Confirm references to 'main.py' or 'index.js' are correct in Dockerfiles.
+ - Ensure dependencies in requirements.txt/package.json are pinned for reliability.
+ - Rebuild everything: 'docker-compose down && docker-compose build --no-cache && docker-compose up -d'.
+ - Then run 'docker-compose logs -f' and verify no crash loops.
+
+[3] VOTS DASHBOARD & MONITORING
+-------------------------------------------------------
+ - Integrate EnhancedSystemMonitor logs/metrics into your VOTS Dashboard or a Gradio-based UI.
+ - Add real-time performance & alert views, using logs from each container.
+ - Optionally unify AI & Solana backtesting pipelines for advanced introspection.
+
+[4] ROUTINE AUTOMATION
+-------------------------------------------------------
+ - Use 'daily_repo_maintenance.py' or 'daily_oracle_maintenance.py' to automate merges/tests/deploys.
+ - Example: in crontab, schedule daily runs with 'python daily_repo_maintenance.py'.
+ - Keep an eye on 'master_maintenance_script.log' or similar logs for recurring failures.
+
+[5] VERIFY & POLISH
+-------------------------------------------------------
+ - For each service: openai_service, ragchain_service, quant_service, solana_agents, argus_service.
+   1) Confirm new code is actually present.
+   2) Run local tests if possible (e.g., "pytest tests" or "npm test").
+   3) Validate environment variables (check logs).
+ - If any service fails, check 'docker logs' & fix errors accordingly.
+
+[DONE] Review these steps and execute them manually.
+      That should finalize your integration of the advanced architecture.
+[INFO] Found daily_repo_maintenance.py, offer to run it.
+[INFO] Running daily_repo_maintenance.py now...
+Running: git checkout main in /home/oxdev/qmcs
+Running: git fetch upstream in /home/oxdev/qmcs

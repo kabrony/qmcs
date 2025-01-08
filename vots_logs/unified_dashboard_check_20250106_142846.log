@@ -1,0 +1,19 @@
+[INFO] 2025-01-06 14:28:46 - === Starting VOTS for Unified Dashboard System ===
+[INFO] 2025-01-06 14:28:46 - Checking OpenAI service health...
+[INFO] 2025-01-06 14:28:46 - OpenAI Service health: OK
+[INFO] 2025-01-06 14:28:46 - Fetching available models from openai_service...
+[INFO] 2025-01-06 14:28:46 - Available Model IDs:\n
+[ERROR] 2025-01-06 14:28:46 - Required model alias 'gpt-4o' is NOT available!
+[ERROR] 2025-01-06 14:28:46 - Required model alias 'gpt-4o-mini' is NOT available!
+[ERROR] 2025-01-06 14:28:46 - Required model alias 'o1' is NOT available!
+[ERROR] 2025-01-06 14:28:46 - Required model alias 'o1-mini' is NOT available!
+[INFO] 2025-01-06 14:28:46 - Checking dynamic chat completion (advanced model selection)...
+[INFO] 2025-01-06 14:28:46 - Chat completion: PASSED
+[INFO] 2025-01-06 14:28:46 - Solana Agents health: OK
+[ERROR] 2025-01-06 14:28:46 - Failed to retrieve Solana block height!
+[ERROR] 2025-01-06 14:28:46 - RAGChain service health check failed!
+[ERROR] 2025-01-06 14:28:46 - Quant Service health check failed!
+[ERROR] 2025-01-06 14:28:46 - Oracle Service health check failed!
+[ERROR] 2025-01-06 14:28:46 - Argus Service health check failed!
+[ERROR] 2025-01-06 14:28:46 - Overall status: FAILED. See vots_logs/unified_dashboard_check_20250106_142846.log for details.
+[INFO] 2025-01-06 14:28:47 - VOTS Script Completed. Check 'vots_unified_report.txt' for summary. Full logs in 'vots_logs/unified_dashboard_check_20250106_142846.log'.

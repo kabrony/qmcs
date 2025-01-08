@@ -1,0 +1,36 @@
+VOTS Unified Dashboard Script - Start at Mon Jan  6 19:28:44 EST 2025
+
+--- Check 1: OpenAI Service Basic Checks ---
+OpenAI Service Health: PASSED
+Model availability check: DONE
+--- Basic Chat Completion ---
+Chat completion: PASSED
+
+--- Check 1B: OpenAI Service ADVANCED MEMORY (Chroma) ---
+Advanced Memory: add_doc => PASSED
+
+--- Check 2: Solana Agents Service ---
+Solana Agents Health: FAILED
+
+--- Check 3: RAGChain Service ---
+RAGChain Health: FAILED
+
+--- Check 4: Quant Service ---
+Quant Health: PASSED
+
+--- Check 5: Oracle Service ---
+Oracle Health: PASSED
+
+--- Check 6: Argus Service ---
+Argus Health: FAILED
+
+--- FINAL SUMMARY ---
+Overall VOTS Status: FAILED
+Detailed log file: vots_logs/unified_dashboard_check_20250106_192844.log
+###############################################################################
+UNIFIED DASHBOARD SYSTEM INTEGRATION NOTES:
+ - Check Solana Agents port alignment or container logs if health fails.
+ - If quant_service /test_redis or /test_mongo return not 'ok', fix logic.
+ - For advanced usage, see memory code in openai_service (/add_doc & /ask),
+   or 'executeTrade()' in solana_agents, etc.
+###############################################################################
