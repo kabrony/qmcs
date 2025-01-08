@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 
 # An array of opening and corresponding closing sequences for html tags,
 # last argument defines whether it can terminate a paragraph or not
-HTML_SEQUENCES: list[tuple[re.Pattern[str], re.Pattern[str], bool]] = [
+HTML_SEQUENCES: list[tuple[re.Pattern, re.Pattern, bool]] = [
     (
         re.compile(r"^<(script|pre|style|textarea)(?=(\s|>|$))", re.IGNORECASE),
         re.compile(r"<\/(script|pre|style|textarea)>", re.IGNORECASE),
@@ -31,20 +31,21 @@ HTML_SEQUENCES: list[tuple[re.Pattern[str], re.Pattern[str], bool]] = [
 ]
 
 
-def html_block(state: StateBlock, startLine: int, endLine: int, silent: bool) -> bool:
+def html_block(state: StateBlock, startLine: int, endLine: int, silent: bool):
     LOGGER.debug(
         "entering html_block: %s, %s, %s, %s", state, startLine, endLine, silent
     )
     pos = state.bMarks[startLine] + state.tShift[startLine]
     maximum = state.eMarks[startLine]
 
-    if state.is_code_block(startLine):
+    # if it's indented more than 3 spaces, it should be a code block
+    if state.sCount[startLine] - state.blkIndent >= 4:
         return False
 
     if not state.md.options.get("html", None):
         return False
 
-    if state.src[pos] != "<":
+    if state.srcCharCode[pos] != 0x3C:  # /* < */
         return False
 
     lineText = state.src[pos:maximum]

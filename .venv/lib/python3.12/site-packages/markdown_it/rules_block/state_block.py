@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
-from ..common.utils import isStrSpace
+from ..common.utils import isSpace
 from ..ruler import StateBase
 from ..token import Token
-from ..utils import EnvType
 
 if TYPE_CHECKING:
     from markdown_it.main import MarkdownIt
@@ -13,9 +12,18 @@ if TYPE_CHECKING:
 
 class StateBlock(StateBase):
     def __init__(
-        self, src: str, md: MarkdownIt, env: EnvType, tokens: list[Token]
-    ) -> None:
-        self.src = src
+        self,
+        src: str,
+        md: MarkdownIt,
+        env,
+        tokens: list[Token],
+        srcCharCode: tuple[int, ...] | None = None,
+    ):
+        if srcCharCode is not None:
+            self._src = src
+            self.srcCharCode = srcCharCode
+        else:
+            self.src = src
 
         # link to parser instance
         self.md = md
@@ -28,11 +36,11 @@ class StateBlock(StateBase):
 
         self.tokens = tokens
 
-        self.bMarks: list[int] = []  # line begin offsets for fast jumps
-        self.eMarks: list[int] = []  # line end offsets for fast jumps
+        self.bMarks = []  # line begin offsets for fast jumps
+        self.eMarks = []  # line end offsets for fast jumps
         # offsets of the first non-space characters (tabs not expanded)
-        self.tShift: list[int] = []
-        self.sCount: list[int] = []  # indents for each line (tabs expanded)
+        self.tShift = []
+        self.sCount = []  # indents for each line (tabs expanded)
 
         # An amount of virtual spaces (tabs expanded) between beginning
         # of each line (bMarks) and real beginning of that line.
@@ -44,7 +52,7 @@ class StateBlock(StateBase):
         # an initial tab length, e.g. bsCount=21 applied to string `\t123`
         # means first tab should be expanded to 4-21%4 === 3 spaces.
         #
-        self.bsCount: list[int] = []
+        self.bsCount = []
 
         # block parser variables
         self.blkIndent = 0  # required block content indent (for example, if we are
@@ -71,12 +79,12 @@ class StateBlock(StateBase):
         start = pos = indent = offset = 0
         length = len(self.src)
 
-        for pos, character in enumerate(self.src):
+        for pos, character in enumerate(self.srcCharCode):
             if not indent_found:
-                if isStrSpace(character):
+                if isSpace(character):
                     indent += 1
 
-                    if character == "\t":
+                    if character == 0x09:
                         offset += 4 - offset % 4
                     else:
                         offset += 1
@@ -84,8 +92,8 @@ class StateBlock(StateBase):
                 else:
                     indent_found = True
 
-            if character == "\n" or pos == length - 1:
-                if character != "\n":
+            if character == 0x0A or pos == length - 1:
+                if character != 0x0A:
                     pos += 1
                 self.bMarks.append(start)
                 self.eMarks.append(pos)
@@ -107,16 +115,13 @@ class StateBlock(StateBase):
 
         self.lineMax = len(self.bMarks) - 1  # don't count last fake line
 
-        # pre-check if code blocks are enabled, to speed up is_code_block method
-        self._code_enabled = "code" in self.md["block"].ruler.get_active_rules()
-
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
             f"{self.__class__.__name__}"
             f"(line={self.line},level={self.level},tokens={len(self.tokens)})"
         )
 
-    def push(self, ttype: str, tag: str, nesting: Literal[-1, 0, 1]) -> Token:
+    def push(self, ttype: str, tag: str, nesting: int) -> Token:
         """Push new token to "stream"."""
         token = Token(ttype, tag, nesting)
         token.block = True
@@ -147,12 +152,8 @@ class StateBlock(StateBase):
 
     def skipSpaces(self, pos: int) -> int:
         """Skip spaces from given position."""
-        while True:
-            try:
-                current = self.src[pos]
-            except IndexError:
-                break
-            if not isStrSpace(current):
+        while pos < len(self.src):
+            if not isSpace(self.srcCharCode[pos]):
                 break
             pos += 1
         return pos
@@ -163,51 +164,25 @@ class StateBlock(StateBase):
             return pos
         while pos > minimum:
             pos -= 1
-            if not isStrSpace(self.src[pos]):
+            if not isSpace(self.srcCharCode[pos]):
                 return pos + 1
         return pos
 
     def skipChars(self, pos: int, code: int) -> int:
-        """Skip character code from given position."""
-        while True:
-            try:
-                current = self.srcCharCode[pos]
-            except IndexError:
-                break
-            if current != code:
-                break
-            pos += 1
-        return pos
-
-    def skipCharsStr(self, pos: int, ch: str) -> int:
-        """Skip character string from given position."""
-        while True:
-            try:
-                current = self.src[pos]
-            except IndexError:
-                break
-            if current != ch:
+        """Skip char codes from given position."""
+        while pos < len(self.src):
+            if self.srcCharCode[pos] != code:
                 break
             pos += 1
         return pos
 
     def skipCharsBack(self, pos: int, code: int, minimum: int) -> int:
-        """Skip character code reverse from given position - 1."""
+        """Skip char codes reverse from given position - 1."""
         if pos <= minimum:
             return pos
         while pos > minimum:
             pos -= 1
             if code != self.srcCharCode[pos]:
-                return pos + 1
-        return pos
-
-    def skipCharsStrBack(self, pos: int, ch: str, minimum: int) -> int:
-        """Skip character string reverse from given position - 1."""
-        if pos <= minimum:
-            return pos
-        while pos > minimum:
-            pos -= 1
-            if ch != self.src[pos]:
                 return pos + 1
         return pos
 
@@ -223,16 +198,15 @@ class StateBlock(StateBase):
         while line < end:
             lineIndent = 0
             lineStart = first = self.bMarks[line]
-            last = (
-                self.eMarks[line] + 1
-                if line + 1 < end or keepLastLF
-                else self.eMarks[line]
-            )
+            if line + 1 < end or keepLastLF:
+                last = self.eMarks[line] + 1
+            else:
+                last = self.eMarks[line]
 
             while (first < last) and (lineIndent < indent):
-                ch = self.src[first]
-                if isStrSpace(ch):
-                    if ch == "\t":
+                ch = self.srcCharCode[first]
+                if isSpace(ch):
+                    if ch == 0x09:
                         lineIndent += 4 - (lineIndent + self.bsCount[line]) % 4
                     else:
                         lineIndent += 1
@@ -253,9 +227,3 @@ class StateBlock(StateBase):
             i += 1
 
         return "".join(queue)
-
-    def is_code_block(self, line: int) -> bool:
-        """Check if line is a code block,
-        i.e. the code block rule is enabled and text is indented by more than 3 spaces.
-        """
-        return self._code_enabled and (self.sCount[line] - self.blkIndent) >= 4

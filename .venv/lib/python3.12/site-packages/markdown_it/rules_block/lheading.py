@@ -1,20 +1,22 @@
 # lheading (---, ==)
 import logging
 
+from ..ruler import Ruler
 from .state_block import StateBlock
 
 LOGGER = logging.getLogger(__name__)
 
 
-def lheading(state: StateBlock, startLine: int, endLine: int, silent: bool) -> bool:
+def lheading(state: StateBlock, startLine: int, endLine: int, silent: bool):
     LOGGER.debug("entering lheading: %s, %s, %s, %s", state, startLine, endLine, silent)
 
     level = None
     nextLine = startLine + 1
-    ruler = state.md.block.ruler
+    ruler: Ruler = state.md.block.ruler
     terminatorRules = ruler.getRules("paragraph")
 
-    if state.is_code_block(startLine):
+    # if it's indented more than 3 spaces, it should be a code block
+    if state.sCount[startLine] - state.blkIndent >= 4:
         return False
 
     oldParentType = state.parentType
@@ -34,15 +36,16 @@ def lheading(state: StateBlock, startLine: int, endLine: int, silent: bool) -> b
             maximum = state.eMarks[nextLine]
 
             if pos < maximum:
-                marker = state.src[pos]
+                marker = state.srcCharCode[pos]
 
-                if marker in ("-", "="):
-                    pos = state.skipCharsStr(pos, marker)
+                # /* - */  /* = */
+                if marker == 0x2D or marker == 0x3D:
+                    pos = state.skipChars(pos, marker)
                     pos = state.skipSpaces(pos)
 
                     # /* = */
                     if pos >= maximum:
-                        level = 1 if marker == "=" else 2
+                        level = 1 if marker == 0x3D else 2
                         break
 
         # quirk for blockquotes, this line should already be checked by that rule
@@ -70,7 +73,7 @@ def lheading(state: StateBlock, startLine: int, endLine: int, silent: bool) -> b
     state.line = nextLine + 1
 
     token = state.push("heading_open", "h" + str(level), 1)
-    token.markup = marker
+    token.markup = chr(marker)
     token.map = [startLine, state.line]
 
     token = state.push("inline", "", 0)
@@ -79,7 +82,7 @@ def lheading(state: StateBlock, startLine: int, endLine: int, silent: bool) -> b
     token.children = []
 
     token = state.push("heading_close", "h" + str(level), -1)
-    token.markup = marker
+    token.markup = chr(marker)
 
     state.parentType = oldParentType
 

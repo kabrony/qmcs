@@ -1,0 +1,3 @@
+[console_scripts]
+gradio = gradio.reload:run_in_reload_mode
+upload_theme = gradio.themes.upload_theme:main

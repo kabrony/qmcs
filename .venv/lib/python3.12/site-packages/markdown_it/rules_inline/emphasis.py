@@ -1,30 +1,31 @@
 # Process *this* and _that_
 #
-from __future__ import annotations
 
 from .state_inline import Delimiter, StateInline
 
 
-def tokenize(state: StateInline, silent: bool) -> bool:
+def tokenize(state: StateInline, silent: bool):
     """Insert each marker as a separate text token, and add it to delimiter list"""
     start = state.pos
-    marker = state.src[start]
+    marker = state.srcCharCode[start]
 
     if silent:
         return False
 
-    if marker not in ("_", "*"):
+    # /* _ */  /* * */
+    if marker != 0x5F and marker != 0x2A:
         return False
 
-    scanned = state.scanDelims(state.pos, marker == "*")
+    scanned = state.scanDelims(state.pos, marker == 0x2A)
 
-    for _ in range(scanned.length):
+    for i in range(scanned.length):
         token = state.push("text", "", 0)
-        token.content = marker
+        token.content = chr(marker)
         state.delimiters.append(
             Delimiter(
-                marker=ord(marker),
+                marker=marker,
                 length=scanned.length,
+                jump=i,
                 token=len(state.tokens) - 1,
                 end=-1,
                 open=scanned.can_open,
@@ -37,7 +38,7 @@ def tokenize(state: StateInline, silent: bool) -> bool:
     return True
 
 
-def _postProcess(state: StateInline, delimiters: list[Delimiter]) -> None:
+def _postProcess(state, delimiters):
     i = len(delimiters) - 1
     while i >= 0:
         startDelim = delimiters[i]
@@ -62,11 +63,9 @@ def _postProcess(state: StateInline, delimiters: list[Delimiter]) -> None:
         isStrong = (
             i > 0
             and delimiters[i - 1].end == startDelim.end + 1
-            # check that first two markers match and adjacent
-            and delimiters[i - 1].marker == startDelim.marker
             and delimiters[i - 1].token == startDelim.token - 1
-            # check that last two markers are adjacent (we can safely assume they match)
             and delimiters[startDelim.end + 1].token == endDelim.token + 1
+            and delimiters[i - 1].marker == startDelim.marker
         )
 
         ch = chr(startDelim.marker)
@@ -93,7 +92,7 @@ def _postProcess(state: StateInline, delimiters: list[Delimiter]) -> None:
         i -= 1
 
 
-def postProcess(state: StateInline) -> None:
+def postProcess(state: StateInline):
     """Walk through delimiter list and replace text tokens with tags."""
     _postProcess(state, state.delimiters)
 
